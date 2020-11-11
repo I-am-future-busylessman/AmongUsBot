@@ -16,6 +16,7 @@ public class User {
     private String colorToKill ="y";
     private String confirmColorToKill = "e";
     private long killTime = 0;
+    private long sabotageTime = 0;
     int easyTasks;
     int normalTasks;
     int hardTasks;

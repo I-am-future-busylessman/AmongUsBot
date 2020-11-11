@@ -22,13 +22,16 @@ public class BotCore extends TelegramLongPollingBot {
     String sabotage = "v";
     boolean sabotageStatus = false;
     HashMap<String, Integer> voteResults = new HashMap<>();
-    private Settings settings = new Settings(2, 2, 2, 2, 90, 1);
+    private Settings settings = new Settings(3, 2, 2, 2, 10, 2);
     String[] subStr;
     int voted = 0;
     public void onUpdateReceived(Update update) {
         String message = update.getMessage().getText();
         if(!update.getMessage().hasText()){
             sendMsg(update.getMessage().getChatId(), "Я понимаю только текст", null);
+        }else if(message.equals("2020")){
+            sabotageStatus = false;
+            sendMsg(update.getMessage().getChatId(), "ты успешно починил саботаж", Keyboards.rolePanel(players.getUser(update.getMessage().getChatId()).getRole(),players.getUser(update.getMessage().getChatId()).getAlive()));
         }else if(gameStatus.equals("init") && update.getMessage().getChatId().toString().equals(admin.getChatId())) {
             adminBeforeStart(update, message);
         }else if(gameStatus.equals("init") && !update.getMessage().getChatId().toString().equals(admin.getChatId())) {
@@ -46,11 +49,15 @@ public class BotCore extends TelegramLongPollingBot {
         }
     }
 
+    public void playerInGame(){
+
+    }
+
     public void imposterInGame(Update update, String message){
         System.out.println(gameStatus);
         Date time = new Date();
         if (message.equals("Убить")){
-            if (time.getTime() - players.getUser(update.getMessage().getChatId()).getKillTime() > 120000) {
+            if (time.getTime() - players.getUser(update.getMessage().getChatId()).getKillTime() > settings.getImposterKD()*1000) {
                 players.getUser(update.getMessage().getChatId()).setColorToKill(null);
                 sendMsg(update.getMessage().getChatId(), "Кому снести башку?", Keyboards.votePanel(players));
             }else{
@@ -64,30 +71,33 @@ public class BotCore extends TelegramLongPollingBot {
             if (players.getUser(update.getMessage().getChatId()).getColorToKill().equals(message) && players.getPlayerByColor(message) != null){
                 players.getPlayerByColor(message).setAlive(false);
                 sendMsg(update.getMessage().getChatId(), message + " убит, валим", Keyboards.rolePanel(false, true));
-                sendMsg(players.getPlayerByColor(message).getChatID(), "Вас убили, какая жалость", Keyboards.rolePanel(true, false));
+                sendMsg(players.getPlayerByColor(message).getChatID(), "Вас убили, какая жалость", Keyboards.rolePanel(players.getPlayerByColor(message).getRole(), false));
                 players.getUser(update.getMessage().getChatId()).setKillTime(time.getTime());
             }else{
                 sendMsg(update.getMessage().getChatId(), "Не попал, салага", Keyboards.rolePanel(false, true));
             }
             players.getUser(update.getMessage().getChatId()).setConfirmColorToKill(message);
-        }else if(message.equals("Саботаж") && !sabotageStatus){
-            sabotage = "Саботаж";
-            sendMsg(update.getMessage().getChatId(), "Что хочешь сломать?", Keyboards.sabotagePanel());
+        }else if(message.equals("Саботаж")){
+            if (time.getTime() - players.getUser(update.getMessage().getChatId()).getSabotageTime() > 60000 && !sabotageStatus) {
+                sabotage = "Саботаж";
+                sendMsg(update.getMessage().getChatId(), "Что хочешь сломать?", Keyboards.sabotagePanel());
+            }else{
+                sendMsg(update.getMessage().getChatId(), "Саботаж не готов",Keyboards.rolePanel(players.getUser(update.getMessage().getChatId()).getRole(), players.getUser(update.getMessage().getChatId()).getAlive()));
+            }
         }else if(message.equals("Репорт")){
             gameStatus = "vote";
             report();
         }else if(sabotage.equals("Саботаж")){
-            sendSabotage(message);
+            players.getUser(update.getMessage().getChatId()).setSabotageTime(time.getTime());
             sabotage = message;
             sabotageStatus = true;
             CompletableFuture.runAsync(()->{
                 try {
-                    Thread.sleep(120000);
+                    Thread.sleep(60000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 sabotageEnd();});
-            sendMsg(update.getMessage().getChatId(), "Ты сломал " + message, Keyboards.rolePanel(false, players.getUser(update.getMessage().getChatId()).getAlive()));
             sendMsg(Long.valueOf(admin.getChatId()), "Сломай " + message, Keyboards.adminGamePanel());
             sendSabotage(message);
         }else{
@@ -169,7 +179,7 @@ public class BotCore extends TelegramLongPollingBot {
                 if (players.getPlayers().get(i).getRole()){
                     sendMsg(players.getPlayers().get(i).getChatID(), "Ты Мирный", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                 }else{
-                    sendMsg(players.getPlayers().get(i).getChatID(), "Ты Убица", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                    sendMsg(players.getPlayers().get(i).getChatID(), "Ты Убийца", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                 }
             }
         }else {
@@ -177,17 +187,23 @@ public class BotCore extends TelegramLongPollingBot {
         }
     }
 
+    public void reboot(Update update){
+        for (int i = 0; i < players.countAlive(); i++){
+            sendMsg(players.getPlayers().get(i).getChatID(), "Перезапуск игры, нажмите /start", Keyboards.startPanel());
+        }
+        sendMsg(update.getMessage().getChatId(), "Перезапуск", Keyboards.adminStartPanel());
+        players = new PlayersList();
+        gameStatus = "init";
+        sabotageStatus = false;
+        sabotage = "v";
+    }
+
     public void adminInGame(Update update, String message){
         if (message.equals("Голосование")){
             gameStatus = "vote";
             report();
         }else if(message.equals("Перезапуск")){
-            for (int i = 0; i < players.countAlive(); i++){
-                sendMsg(players.getPlayers().get(i).getChatID(), "Перезапуск игры, нажмите /start", Keyboards.startPanel());
-            }
-                sendMsg(update.getMessage().getChatId(), "Перезапуск", Keyboards.adminStartPanel());
-            players = new PlayersList();
-            gameStatus = "init";
+            reboot(update);
         }else if(message.equals("Воскресить")
         ){
             admin.setMakeAlive(null);
