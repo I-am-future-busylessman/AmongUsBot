@@ -10,7 +10,7 @@ public class Keyboards {
 
     public static ReplyKeyboardMarkup rolePanel(boolean role, boolean alive){
         if (role){
-            return crewmatePanel(alive);
+            return crewMemberPanel(alive);
         }else{
             return imposterPanel(alive);
         }
@@ -56,7 +56,7 @@ public class Keyboards {
         return replyKeyboardMarkup;
     }
 
-    public static ReplyKeyboardMarkup crewmatePanel(boolean alive) {
+    public static ReplyKeyboardMarkup crewMemberPanel(boolean alive) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
