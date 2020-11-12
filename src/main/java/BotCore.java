@@ -20,133 +20,50 @@ public class BotCore extends TelegramLongPollingBot {
     PlayersList players = new PlayersList();
     String gameStatus = "init";
     String sabotage = "v";
+    boolean someoneKilled = false;
     boolean sabotageStatus = false;
     HashMap<String, Integer> voteResults = new HashMap<>();
-    private Settings settings = new Settings(3, 2, 2, 2, 10, 2);
+    private Settings settings = new Settings(6, 2, 2, 2, 10, 1);
     String[] subStr;
     int voted = 0;
+
     public void onUpdateReceived(Update update) {
         String message = update.getMessage().getText();
-        if(!update.getMessage().hasText()){
-            sendMsg(update.getMessage().getChatId(), "Я понимаю только текст", null);
-        }else if(message.equals("2020")){
-            sabotageStatus = false;
-            sendMsg(update.getMessage().getChatId(), "ты успешно починил саботаж", Keyboards.rolePanel(players.getUser(update.getMessage().getChatId()).getRole(),players.getUser(update.getMessage().getChatId()).getAlive()));
-        }else if(gameStatus.equals("init") && update.getMessage().getChatId().toString().equals(admin.getChatId())) {
-            adminBeforeStart(update, message);
-        }else if(gameStatus.equals("init") && !update.getMessage().getChatId().toString().equals(admin.getChatId())) {
-            playerBeforeStart(update, message);
-        }else if(((gameStatus.equals("game")) || (gameStatus.equals("Саботаж")) || (gameStatus.equals("vote"))) && update.getMessage().getChatId().toString().equals(admin.getChatId())){
-            adminInGame(update, message);
-        }else if(gameStatus.equals("game") && players.getUser(update.getMessage().getChatId()).getRole().equals(false)){
-            imposterInGame(update, message);
-        }else if(gameStatus.equals("vote") && !players.getUser(update.getMessage().getChatId()).getVoted()){
-            playersVote(update, message);
-        }else if(gameStatus.equals("init") && update.getMessage().getChatId().toString().equals(admin.getChatId())) {
-            playerBeforeStart(update, message);
+        long chatId = update.getMessage().getChatId();
+        if(!update.getMessage().hasText()) {
+            sendMsg(chatId, "Я понимаю только текст", null);
+        }else if(gameStatus.equals("init") && chatId == admin.getChatId()){
+            adminBeforeStart(message);
+        }else if(gameStatus.equals("init") && !(chatId == admin.getChatId())){
+            User user = players.getUser(chatId);
+            userBeforeStart(update, message, user);
+        }else if(((gameStatus.equals("game")) || (gameStatus.equals("vote"))) && chatId == admin.getChatId()){
+            adminInGame(message);
+        }else if (gameStatus.equals("game") && players.getUser(chatId).getRole().equals(true)){
+            User user = players.getUser(chatId);
+            crewMemberInGame(message, user);
+        }else if(gameStatus.equals("game") && players.getUser(chatId).getRole().equals(false)){
+            User user = players.getUser(chatId);
+            imposterInGame(message, user);
+        }else if(gameStatus.equals("vote") && !players.getUser(chatId).getVoted()){
+            User user = players.getUser(chatId);
+            playersVote(message, user);
         }else{
-            sendMsg(update.getMessage().getChatId(), "Неизвестная команда", null);
+            sendMsg(chatId, "Неизвестная команда", null);
         }
     }
 
-    public void playerInGame(){
-
-    }
-
-    public void imposterInGame(Update update, String message){
-        System.out.println(gameStatus);
-        Date time = new Date();
-        if (message.equals("Убить")){
-            if (time.getTime() - players.getUser(update.getMessage().getChatId()).getKillTime() > settings.getImposterKD()*1000) {
-                players.getUser(update.getMessage().getChatId()).setColorToKill(null);
-                sendMsg(update.getMessage().getChatId(), "Кому снести башку?", Keyboards.votePanel(players));
-            }else{
-                sendMsg(update.getMessage().getChatId(), "Бластер ещё не перезаряжен", Keyboards.rolePanel(false, true));
-            }
-        }else if(players.getUser(update.getMessage().getChatId()).getColorToKill() == null){
-            players.getUser(update.getMessage().getChatId()).setColorToKill(message);
-            players.getUser(update.getMessage().getChatId()).setConfirmColorToKill(null);
-            sendMsg(update.getMessage().getChatId(),"Забыл снять предохранитель, повтори", Keyboards.votePanel(players));
-        }else if(players.getUser(update.getMessage().getChatId()).getConfirmColorToKill() == null){
-            if (players.getUser(update.getMessage().getChatId()).getColorToKill().equals(message) && players.getPlayerByColor(message) != null){
-                players.getPlayerByColor(message).setAlive(false);
-                sendMsg(update.getMessage().getChatId(), message + " убит, валим", Keyboards.rolePanel(false, true));
-                sendMsg(players.getPlayerByColor(message).getChatID(), "Вас убили, какая жалость", Keyboards.rolePanel(players.getPlayerByColor(message).getRole(), false));
-                players.getUser(update.getMessage().getChatId()).setKillTime(time.getTime());
-            }else{
-                sendMsg(update.getMessage().getChatId(), "Не попал, салага", Keyboards.rolePanel(false, true));
-            }
-            players.getUser(update.getMessage().getChatId()).setConfirmColorToKill(message);
-        }else if(message.equals("Саботаж")){
-            if (time.getTime() - players.getUser(update.getMessage().getChatId()).getSabotageTime() > 60000 && !sabotageStatus) {
-                sabotage = "Саботаж";
-                sendMsg(update.getMessage().getChatId(), "Что хочешь сломать?", Keyboards.sabotagePanel());
-            }else{
-                sendMsg(update.getMessage().getChatId(), "Саботаж не готов",Keyboards.rolePanel(players.getUser(update.getMessage().getChatId()).getRole(), players.getUser(update.getMessage().getChatId()).getAlive()));
-            }
-        }else if(message.equals("Репорт")){
-            gameStatus = "vote";
-            report();
-        }else if(sabotage.equals("Саботаж")){
-            players.getUser(update.getMessage().getChatId()).setSabotageTime(time.getTime());
-            sabotage = message;
-            sabotageStatus = true;
-            CompletableFuture.runAsync(()->{
-                try {
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                sabotageEnd();});
-            sendMsg(Long.valueOf(admin.getChatId()), "Сломай " + message, Keyboards.adminGamePanel());
-            sendSabotage(message);
-        }else{
-            sendMsg(update.getMessage().getChatId(), "Неизвестная команда" ,Keyboards.rolePanel(false, players.getUser(update.getMessage().getChatId()).getAlive()));
-        }
-    }
-
-    public void report(){
-        for (int i = 0; i < players.getPlayers().size(); i++) {
-            if (players.getPlayers().get(i).getAlive()) {
-                sendMsg(players.getPlayers().get(i).getChatID(), "Найден труп! Собрание!", Keyboards.votePanel(players));
-            } else {
-                sendMsg(players.getPlayers().get(i).getChatID(), "Найден труп! \n Но вы тоже мертвы и не голосуете." +
-                        "\nПройдите к администратору.", Keyboards.votePanel(players));
-            }
-        }
-    }
-
-    public void sendSabotage(String text){
-        for (int i = 0; i < players.getPlayers().size(); i++){
-            if (players.getPlayers().get(i).getAlive()){
-                sendMsg(players.getPlayers().get(i).getChatID(), "Cломали " + text +
-                        "\nЧтобы починить введи код с выполнения задания починки", Keyboards.rolePanel(players.getPlayers().get(i).getRole(),true));
-            }
-        }
-    }
-
-    public void sabotageEnd(){
-        if (sabotageStatus){
-            gameEnd(false);
-        }
-    }
-
-    public void gameEnd(boolean winners){
-        gameStatus = "init";
-        for (int i = 0; i < players.getPlayers().size(); i++){
-            if(players.getPlayers().get(i).getRole()){
-                sendMsg(players.getPlayers().get(i).getChatID(), winners ? "Поздравляем вы победили": "В этот раз победа за предателями", Keyboards.startPanel());
-            }else{
-                sendMsg(players.getPlayers().get(i).getChatID(), winners ? "В этот раз победа за экипажем": "Корабль захвачен!", Keyboards.startPanel());
-            }
-        }
-    }
-
-    public void adminBeforeStart(Update update, String message){
+    public void adminBeforeStart(String message){
         if (message.compareTo("/start") == 0) {
-            sendMsg(update.getMessage().getChatId(), "Здравствуй, администратор", Keyboards.adminStartPanel());
+            sendMsg(admin.getChatId(), "Здравствуй, администратор", Keyboards.adminStartPanel());
         }else if (message.compareTo("Настройки") == 0){
-            sendMsg(update.getMessage().getChatId(), "Введите настройки в следующем формате: '/set количество_игроков количество_простых_заданий количество_средних количество_сложных кд_убийцы'", null);
+            sendMsg(admin.getChatId(), "Введите настройки в следующем формате: " +
+                    "\n/set количество_игроков " +
+                    "количество_простых_заданий " +
+                    "количество_средних " +
+                    "количество_сложных " +
+                    "кд_убийцы " +
+                    "количество_убийц", null);
         }else if (message.length() > 4 && message.substring(0, 4).compareTo("/set") == 0){
             subStr = message.split(" ");
             settings.setPlayers(Integer.valueOf(subStr[1]));
@@ -155,82 +72,264 @@ public class BotCore extends TelegramLongPollingBot {
             settings.setHardTasks(Integer.valueOf(subStr[4]));
             settings.setImposterKD(Integer.valueOf(subStr[5]));
             settings.setImpostersCount(Integer.valueOf(subStr[6]));
-            sendMsg(update.getMessage().getChatId(), "Настройки сохранены", null);
+            sendMsg(admin.getChatId(), "Настройки сохранены", null);
         }else if (message.compareTo("Покажи настройки") == 0){
-            sendMsg(update.getMessage().getChatId(), settings.getAllSettings(), null);
+            sendMsg(admin.getChatId(), settings.getAllSettings(), null);
         }else if (message.compareTo("Запуск") == 0) {
             gameStatus = "game";
             int impostersCount = 0;
-            sendMsg(update.getMessage().getChatId(), "Запускаем игру...", Keyboards.adminGamePanel());
-            System.out.println(settings.getImpostersCount());
-            while (impostersCount != settings.getImpostersCount()) {
+            sendMsg(admin.getChatId(), "Запускаем игру...", Keyboards.adminGamePanel());
+            while (impostersCount != settings.getImpostersCount()){
                 impostersCount = 0;
                 for (int i = 0; i < players.getPlayers().size(); i++) {
                     int randomNumber = (int) (Math.random() * 100);
                     if (randomNumber % 3 == 0 && impostersCount < settings.getImpostersCount()) {
                         players.getPlayers().get(i).setRole(false);
+
                         impostersCount++;
                     }else{
                         players.getPlayers().get(i).setRole(true);
                     }
+                    players.getPlayers().get(i).setEasyTasks(settings.getEasyTasks());
+                    players.getPlayers().get(i).setNormalTasks(settings.getNormalTasks());
+                    players.getPlayers().get(i).setHardTasks(settings.getHardTasks());
+                    players.getPlayers().get(i).setTotalTasks(settings.getEasyTasks() + settings.getNormalTasks() + settings.getHardTasks());
                 }
             }
             for (int i = 0; i < players.getPlayers().size(); i++) {
                 if (players.getPlayers().get(i).getRole()){
-                    sendMsg(players.getPlayers().get(i).getChatID(), "Ты Мирный", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                    sendMsg(players.getPlayers().get(i).getChatId(), "Ты Мирный", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                 }else{
-                    sendMsg(players.getPlayers().get(i).getChatID(), "Ты Убийца", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                    sendMsg(players.getPlayers().get(i).getChatId(), "Ты Убийца", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                 }
             }
         }else {
-            sendMsg(update.getMessage().getChatId(), "Неизвестная команда", Keyboards.adminStartPanel());
+            sendMsg(admin.getChatId(), "Неизвестная команда", Keyboards.adminStartPanel());
         }
     }
 
-    public void reboot(Update update){
-        for (int i = 0; i < players.countAlive(); i++){
-            sendMsg(players.getPlayers().get(i).getChatID(), "Перезапуск игры, нажмите /start", Keyboards.startPanel());
+    public void userBeforeStart(Update update, String message, User user){
+        if(message.equals("/start")){
+            players.addPlayer(new User(update.getMessage().getChatId()));
+            sendMsg(update.getMessage().getChatId(), "Здравствуй, игрок, Какой у тебя цвет?", null);
+        }else if(user.getChatId() != null && user.getColor() == null && gameStatus.equals("init")){
+            user.setColor(message.toLowerCase());
+            user.setAlive(true);
+            user.setVoted(false);
+            System.out.println("Добален " + user.getColor() + " игрок");
+            sendMsg(user.getChatId(), "Привет, " + user.getColor(), null);
+            if(players.getPlayers().stream().filter(u -> u.getColor() != null).count() == settings.getPlayers()){
+                sendMsg(admin.getChatId(), "Команда укомплектована, можно начинать", Keyboards.adminStartPanel());
+            }
+        }else {
+            sendMsg(update.getMessage().getChatId(), "Неизвестная команда", null);
         }
-        sendMsg(update.getMessage().getChatId(), "Перезапуск", Keyboards.adminStartPanel());
+    }
+
+    public void adminInGame(String message){
+        if (message.equals("Голосование")){
+            gameStatus = "vote";
+            someoneKilled = true;
+            report(players.getPlayers().get(0));
+        }else if(message.equals("Перезапуск")){
+            reboot();
+        }else if(message.equals("Воскресить")
+        ){
+            admin.setMakeAlive(null);
+            sendMsg(admin.getChatId(), "Кого хотите воскресить", Keyboards.makeAlive(players));
+        }else if(admin.getMakeAlive() == null){
+            User user = players.getPlayerByColor(message);
+            if (!user.getAlive()) {
+                user.setAlive(true);
+                sendMsg(user.getChatId(), "Вас воскресили", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+                sendMsg(admin.getChatId(), "Успешно", Keyboards.adminGamePanel());
+            }else{
+                sendMsg(admin.getChatId(), "Он и так жив", Keyboards.adminGamePanel());
+            }
+            admin.setMakeAlive("Admin");
+        }else{
+            sendMsg(admin.getChatId(), "Неизвестная команда", null);
+        }
+    }
+
+    public void crewMemberInGame(String message, User user){
+        if(message.equals("Получить задание") && user.getActiveTask() == 0){
+            user.getTask();
+            while (user.getActiveTask() != 0) {
+                int finalTask = user.getActiveTask();
+                System.out.println(finalTask);
+                if (players.getPlayers().stream().noneMatch(u -> u.getActiveTask() == finalTask && !u.getChatId().equals(user.getChatId()))){
+                    break;
+                }
+                user.getTask();
+            }
+            if (user.getActiveTask() == 0){
+                sendMsg(user.getChatId(), "Ты уже всё сделал", Keyboards.rolePanel(true, user.getAlive()));
+            }else {
+                sendMsg(user.getChatId(), "Твоё задание ввести: \"" + settings.getTask(user.getActiveTask()) + "\"", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+            }
+        }else if (user.getActiveTask() != 0 && Integer.parseInt(message) == settings.getTask(user.getActiveTask())){
+            user.getComplitedTasks().add(user.getActiveTask());
+            if(user.getActiveTask()/10 == 1)
+                user.setEasyTasks(user.getEasyTasks() - 1);
+            else if(user.getActiveTask()/10 == 2)
+                user.setNormalTasks(user.getNormalTasks() - 1);
+            else
+                user.setHardTasks(user.getHardTasks() - 1);
+            user.setActiveTask(0);
+            sendMsg(user.getChatId(), "Задание выполнено!", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+            checkGameEnd();
+        }else if (message.equals("Репорт")){
+            report(user);
+        }else if (sabotageStatus){
+            checkSabotage(message, user);
+        }else{
+            sendMsg(user.getChatId(), "Неизвестная команда", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+        }
+    }
+
+    public void imposterInGame(String message, User user){
+        Date time = new Date();
+        if (message.equals("Убить")){
+            if (time.getTime() - user.getKillTime() > settings.getImposterKD()*1000) {
+                user.setColorToKill(null);
+                sendMsg(user.getChatId(), "Кому снести башку?", Keyboards.votePanel(players));
+            }else{
+                sendMsg(user.getChatId(), "Бластер ещё не перезаряжен", Keyboards.rolePanel(false, true));
+            }
+        }else if(user.getColorToKill() == null){
+            user.setColorToKill(message);
+            user.setConfirmColorToKill(null);
+            sendMsg(user.getChatId(),"Забыл снять предохранитель, повтори", Keyboards.votePanel(players));
+        }else if(user.getConfirmColorToKill() == null){
+            if (user.getColorToKill().equals(message) && players.getPlayerByColor(message) != null){
+                if(players.getPlayerByColor(message).getRole()) {
+                    someoneKilled = true;
+                    players.getPlayerByColor(message).setAlive(false);
+                    sendMsg(admin.getChatId(), "Убит " + message, Keyboards.adminGamePanel());
+                    sendMsg(user.getChatId(), message + " убит, валим", Keyboards.rolePanel(false, true));
+                    sendMsg(players.getPlayerByColor(message).getChatId(), "Вас убили, какая жалость", Keyboards.rolePanel(players.getPlayerByColor(message).getRole(), false));
+                    user.setKillTime(time.getTime());
+                    checkGameEnd();
+                }else{
+                    sendMsg(user.getChatId(), "Совсем офигел! Огонь по своим!", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+                }
+            }else{
+                sendMsg(user.getChatId(), "Не попал, салага", Keyboards.rolePanel(false, true));
+            }
+            user.setConfirmColorToKill(message);
+        }else if(message.equals("Саботаж")){
+            if (time.getTime() - user.getSabotageTime() > 120000 && !sabotageStatus) {
+                sabotage = "Саботаж";
+                sendMsg(user.getChatId(), "Что хочешь сломать?", Keyboards.sabotagePanel());
+            }else{
+                sendMsg(user.getChatId(), "Саботаж не готов",Keyboards.rolePanel(user.getRole(), user.getAlive()));
+            }
+        }else if(message.equals("Репорт")){
+            gameStatus = "vote";
+            report(user);
+        }else if(sabotage.equals("Саботаж")){
+            user.setSabotageTime(time.getTime());
+            sabotage = message;
+            sabotageStatus = true;
+            if (message.equals("Реактор") || message.equals("Кислород"))
+            CompletableFuture.runAsync(()->{
+                try {
+                    Thread.sleep(90000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                checkGameEnd();});
+            sendMsg(admin.getChatId(), "Сломай " + message, Keyboards.adminGamePanel());
+            sendSabotage(message);
+        }else if (sabotageStatus) {
+            checkSabotage(message, user);
+        }else{
+            sendMsg(user.getChatId(), "Неизвестная команда" ,Keyboards.rolePanel(false, user.getAlive()));
+        }
+    }
+
+    private void checkSabotage(String message, User user) {
+        if (settings.getSabotageSolvers().get(sabotage).toString().equals(message)) {
+            sabotageStatus = false;
+            for (int i = 0; i < players.getPlayers().size(); i++) {
+                sendMsg(players.getPlayers().get(i).getChatId(), sabotage + " починен!", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+            }
+        } else {
+            sendMsg(user.getChatId(), "Неверный код", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+        }
+    }
+
+    public void sendSabotage(String text){
+        for (int i = 0; i < players.getPlayers().size(); i++){
+            if (players.getPlayers().get(i).getAlive()){
+                sendMsg(players.getPlayers().get(i).getChatId(), "Cломали " + text +
+                        "\nЧтобы починить введи код с выполнения задания починки", Keyboards.rolePanel(players.getPlayers().get(i).getRole(),true));
+            }
+        }
+    }
+
+    public void checkGameEnd(){
+        if (sabotageStatus){
+            gameEnd(false);
+        }else if(players.getPlayers().stream().filter(u -> u.getAlive() && u.getRole()).count() == players.getPlayers().stream().filter(u -> u.getAlive() && !u.getRole()).count()){
+            gameEnd(false);
+        }else if(players.getPlayers().stream().noneMatch(u -> !u.getRole() && u.getAlive())) {
+            gameEnd(true);
+        }else if(players.getPlayers().stream().filter(User::getRole).filter(u -> u.getComplitedTasks().size() == u.totalTasks).count() == settings.getPlayers() - settings.getImpostersCount()){
+            gameEnd(true);
+        }
+    }
+
+    public void gameEnd(boolean winners){
+        gameStatus = "init";
+        for (int i = 0; i < players.getPlayers().size(); i++){
+            if(players.getPlayers().get(i).getRole()){
+                sendMsg(players.getPlayers().get(i).getChatId(), winners ? "Поздравляем вы победили": "В этот раз победа за предателями", Keyboards.startPanel());
+            }else{
+                sendMsg(players.getPlayers().get(i).getChatId(), winners ? "В этот раз победа за экипажем": "Корабль захвачен!", Keyboards.startPanel());
+            }
+        }
+        reboot();
+    }
+
+    public void reboot(){
+        for (int i = 0; i < players.countAlive(); i++){
+            sendMsg(players.getPlayers().get(i).getChatId(), "Перезапуск игры, нажмите /start", Keyboards.startPanel());
+        }
+        sendMsg(admin.getChatId(), "Перезапуск", Keyboards.adminStartPanel());
         players = new PlayersList();
         gameStatus = "init";
         sabotageStatus = false;
         sabotage = "v";
     }
 
-    public void adminInGame(Update update, String message){
-        if (message.equals("Голосование")){
-            gameStatus = "vote";
-            report();
-        }else if(message.equals("Перезапуск")){
-            reboot(update);
-        }else if(message.equals("Воскресить")
-        ){
-            admin.setMakeAlive(null);
-            sendMsg(update.getMessage().getChatId(), "Кого хотите воскресить", Keyboards.makeAlive(players));
-        }else if(admin.getMakeAlive() == null){
-            players.getPlayerByColor(message).setAlive(true);
-            sendMsg(players.getPlayerByColor(message).getChatID(), "Вас воскресили", Keyboards.rolePanel(players.getPlayerByColor(message).getRole(), players.getPlayerByColor(message).getAlive()));
-            sendMsg(Long.valueOf(admin.getChatId()), "Успешно", Keyboards.adminGamePanel());
-            admin.setMakeAlive("Admin");
+    public void report(User user){
+        if (someoneKilled) {
+            sabotageStatus = false;
+            for (int i = 0; i < players.getPlayers().size(); i++) {
+                if (players.getPlayers().get(i).getAlive()) {
+                    sendMsg(players.getPlayers().get(i).getChatId(), "Найден труп! Собрание!", Keyboards.votePanel(players));
+                } else {
+                    sendMsg(players.getPlayers().get(i).getChatId(), "Найден труп! \n Но вы тоже мертвы и не голосуете." +
+                            "\nПройдите к администратору.", Keyboards.votePanel(players));
+                }
+            }
         }else{
-            sendMsg(update.getMessage().getChatId(), "Неизвестная команда", null);
+            sendMsg(user.getChatId(), "Трупа нет, ты врёшь", Keyboards.rolePanel(user.getRole(), user.getAlive()));
         }
     }
 
-    public void playersVote(Update update, String message){
+    public void playersVote(String message, User user){
         if (voteResults.containsKey(message)){
             voteResults.replace(message, voteResults.get(message) + 1);
-            System.out.println("За " + message + "проголосовало " + voteResults.get(message));
         }else{
             voteResults.put(message, 1);
-            System.out.println("За " + message + "проголосовало " + voteResults.get(message));
         }
-        players.getUser(update.getMessage().getChatId()).setVoted(true);
+        user.setVoted(true);
         voted++;
         if (voted == players.countAlive()){
             gameStatus = "game";
-            //игра может закончится
             int maxValueInMap=(Collections.max(voteResults.values()));
             ArrayList<String> killed = new ArrayList<>();
             for (Map.Entry<String, Integer> entry : voteResults.entrySet()) {
@@ -241,46 +340,29 @@ public class BotCore extends TelegramLongPollingBot {
             if (killed.size() == 1 && !killed.get(0).equals("Пропустить")){
                 if(players.getPlayerByColor(killed.get(0)) != null){
                     players.getPlayerByColor(killed.get(0)).setAlive(false);
-                    System.out.println("Убит " + players.getPlayerByColor(killed.get(0)).getColor());
+                    sendMsg(admin.getChatId(), "Убит " + killed.get(0), Keyboards.adminGamePanel());
                     for (int i = 0; i < players.getPlayers().size(); i++) {
-                        System.out.println(players.getPlayers().get(i).getColor());
-                        System.out.println(killed.get(0));
                         if (!players.getPlayers().get(i).getColor().equals(killed.get(0))) {
-                            sendMsg(players.getPlayers().get(i).getChatID(), "Убит " + killed.get(0), Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                            sendMsg(players.getPlayers().get(i).getChatId(), "Вы выкинули " + killed.get(0), Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                         } else {
-                            sendMsg(players.getPlayers().get(i).getChatID(), "К сожалению вас убили." +
+                            sendMsg(players.getPlayers().get(i).getChatId(), "К сожалению вас выкинули." +
                                     "\nПройдите к администратору.", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                         }
                     }
                 }
             }else{
-                System.out.println("Никто не убит");
+                sendMsg(admin.getChatId(), "Никто не выкинут голосованием", Keyboards.adminGamePanel());
                 for (int i = 0; i < players.getPlayers().size(); i++){
-                    sendMsg(players.getPlayers().get(i).getChatID(), "Никто не убит.Голосование пропущено" , Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                    sendMsg(players.getPlayers().get(i).getChatId(), "Никто не выкинут.Голосование пропущено" , Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                 }
             }
             for (int i = 0; i < players.getPlayers().size(); i++) {
                 players.getPlayers().get(i).setVoted(false);
+                sendMsg(players.getPlayers().get(i).getChatId(), "Игра продолжается", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
             }
             voted = 0;
             voteResults = new HashMap<>();
-        }
-    }
-
-    public void playerBeforeStart(Update update, String message){
-        if(message.equals("/start")){
-            players.addPlayer(new User(update.getMessage().getChatId()));
-            sendMsg(update.getMessage().getChatId(), "Здравствуй, игрок, Какой у тебя цвет?", null);
-        }else if(players.getUser(update.getMessage().getChatId()) != null && players.getUser(update.getMessage().getChatId()).getColor() == null && gameStatus.equals("init")){
-            players.getUser(update.getMessage().getChatId()).setColor(message.toLowerCase());
-            players.getUser(update.getMessage().getChatId()).setAlive(true);
-            players.getUser(update.getMessage().getChatId()).setVoted(false);
-            System.out.println("Добален " + players.getUser(update.getMessage().getChatId()).getColor() + " игрок");
-            sendMsg(update.getMessage().getChatId(), "Привет, " + players.getUser(update.getMessage().getChatId()).getColor(), null);
-            if(players.getPlayers().size() == settings.getPlayers())
-                sendMsg(Long.valueOf(admin.getChatId()), "Команда укомплектована, можно начинать", Keyboards.adminStartPanel());
-        }else {
-            sendMsg(update.getMessage().getChatId(), "Неизвестная команда", null);
+            checkGameEnd();
         }
     }
 

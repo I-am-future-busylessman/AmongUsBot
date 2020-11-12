@@ -9,8 +9,8 @@ public class PlayersList{
 
     public long countAlive(){
         int counter = 0;
-        for (int i = 0; i < players.size(); i++){
-            if(players.get(i).getAlive()){
+        for (User player : players) {
+            if (player.getAlive()) {
                 counter++;
             }
         }
@@ -22,20 +22,18 @@ public class PlayersList{
         String finalColor = color;
         if(players.stream().anyMatch(u -> u.getColor().equals(finalColor))) {
             String finalColor1 = color;
-            return players.stream().filter(u -> u.getColor().equals(finalColor1)).findFirst().get();
+            return players.stream().filter(u -> u.getColor().equals(finalColor1)).findFirst().orElse(null);
         }
         return null;
     }
 
     public Boolean findPlayer(User user){
-        boolean isMath = players.stream().anyMatch(u -> u.getChatID().equals(user.getChatID()));
-        return isMath;
+        return players.stream().anyMatch(u -> u.getChatId().equals(user.getChatId()));
     }
 
     public User getUser(Long chatID){
-        if(players.stream().anyMatch(u -> u.getChatID().equals(chatID))){
-            User user = players.stream().filter(u -> u.getChatID().equals(chatID)).findFirst().get();
-            return user;
+        if(players.stream().anyMatch(u -> u.getChatId().equals(chatID))){
+            return players.stream().filter(u -> u.getChatId().equals(chatID)).findFirst().orElse(null);
         }
         return null;
     }

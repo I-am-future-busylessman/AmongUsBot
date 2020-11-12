@@ -7,5 +7,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Admin {
     private String makeAlive = "Admin";
-    private final String chatId = "394615109";
+    private final long chatId = 394615109;
 }

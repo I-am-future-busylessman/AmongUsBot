@@ -4,6 +4,7 @@ import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Keyboards {
 
@@ -14,6 +15,7 @@ public class Keyboards {
             return imposterPanel(alive);
         }
     }
+
     public static ReplyKeyboardMarkup adminStartPanel() {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
@@ -125,9 +127,23 @@ public class Keyboards {
         KeyboardRow keyboardSecondRow = new KeyboardRow();
         for (long i = 0; i < players.getPlayers().stream().filter(u -> u.getAlive().equals(false)).count(); i++){
             if (i < players.getPlayers().stream().filter(u -> u.getAlive().equals(false)).count()/2){
-                keyboardFirstRow.add(new KeyboardButton(players.getPlayers().stream().filter(u -> u.getAlive().equals(false)).skip(i).findFirst().get().getColor()));
+                keyboardFirstRow.add(new KeyboardButton(Objects.
+                        requireNonNull(players
+                                .getPlayers()
+                                .stream()
+                                .filter(u -> u.getAlive().equals(false))
+                                .skip(i)
+                                .findFirst()
+                                .orElse(null)).getColor()));
             }else{
-                keyboardSecondRow.add(new KeyboardButton(players.getPlayers().stream().filter(u -> u.getAlive().equals(false)).skip(i).findFirst().get().getColor()));
+                keyboardSecondRow.add(new KeyboardButton(Objects.
+                        requireNonNull(players
+                                .getPlayers()
+                                .stream()
+                                .filter(u -> u.getAlive().equals(false))
+                                .skip(i)
+                                .findFirst()
+                                .orElse(null)).getColor()));
             }
         }
         keyboard.add(keyboardFirstRow);
@@ -147,9 +163,23 @@ public class Keyboards {
         KeyboardRow keyboardSecondRow = new KeyboardRow();
         for (long i = 0; i < players.getPlayers().stream().filter(User::getAlive).count(); i++){
             if (i < players.getPlayers().stream().filter(User::getAlive).count()/2){
-                keyboardFirstRow.add(new KeyboardButton(players.getPlayers().stream().filter(User::getAlive).skip(i).findFirst().get().getColor()));
+                keyboardFirstRow.add(new KeyboardButton(Objects
+                        .requireNonNull(players
+                                .getPlayers()
+                                .stream()
+                                .filter(User::getAlive)
+                                .skip(i)
+                                .findFirst()
+                                .orElse(null)).getColor()));
             }else{
-                keyboardSecondRow.add(new KeyboardButton(players.getPlayers().stream().filter(User::getAlive).skip(i).findFirst().get().getColor()));
+                keyboardSecondRow.add(new KeyboardButton(Objects
+                        .requireNonNull(players
+                                .getPlayers()
+                                .stream()
+                                .filter(User::getAlive)
+                                .skip(i)
+                                .findFirst()
+                                .orElse(null)).getColor()));
             }
         }
         KeyboardRow keyboardThirdRow = new KeyboardRow();

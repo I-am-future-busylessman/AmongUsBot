@@ -1,7 +1,0 @@
-else if (message == "Настройки" && update.getMessage().getChatId() == admin.getChatId()){
-            sendMsg(update.getMessage(), "Введите настройки в следующем формате: '/set количество_игроков количество_простых_заданий количество_средних количество_сложных кд_убийцы'", null);
-        //}else if (message.substring(0, 4) =="/set" && update.getMessage().getChatId() == admin.getChatId()){
-            //sendMsg(update.getMessage(), "Настройки сохранены", null);
-        }else if (gameStatus == true){
-            //основная логика игры
-        }
