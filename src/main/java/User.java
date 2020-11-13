@@ -23,8 +23,15 @@ public class User {
     int hardTasks;
     int totalTasks;
     private List<Integer> complitedTasks = new ArrayList<>();
+
     public User(Long chatID) {
         this.chatId = chatID;
+    }
+
+    public Long getChatId(){
+        if (chatId != null)
+            return chatId;
+        return -1L;
     }
 
     public void getTask(){
