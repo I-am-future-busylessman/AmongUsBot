@@ -15,6 +15,7 @@ public class Texts {
     private List<String> deadTexts = new ArrayList<>();
     private List<String> killRepeatTexts = new ArrayList<>();
     private List<String> helloTexts = new ArrayList<>();
+    private List<String> reportTexts = new ArrayList<>();
 
     public void makeGettiingTaskTexts() {
         List<String> gettingTaskTexts= new ArrayList<>();
@@ -68,8 +69,16 @@ public class Texts {
         List<String> helloTexts = new ArrayList<>();
         helloTexts.add("Привет, ");
         helloTexts.add("Добро пожаловать на борт, ");
-        helloTexts.add("Расд тебя видеть, ");
+        helloTexts.add("Рад тебя видеть, ");
         this.helloTexts = helloTexts;
+    }
+
+    public void makeReportTexts() {
+        List<String> reportTexts = new ArrayList<>();
+        reportTexts.add("Собрание!");
+        reportTexts.add("Что-то случилось, срочно собираемся!");
+        reportTexts.add("Андрюха, у нас труп! Возможно криминал. По коням!");
+        this.reportTexts = reportTexts;
     }
 
     public Texts() {
@@ -80,5 +89,6 @@ public class Texts {
         makeKillRepeatTexts();
         makeSendingTaskTexts();
         makeDeadTexts();
+        makeReportTexts();
     }
 }

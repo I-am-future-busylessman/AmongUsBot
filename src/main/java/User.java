@@ -68,7 +68,8 @@ public class User {
                 }
             }
         }
-        if (complitedTasks.size() < totalTasks && taskNumber == 0) {
+        int finalNumber = taskNumber;
+        if (complitedTasks.size() < totalTasks && (taskNumber == 0 || complitedTasks.stream().anyMatch(u -> u%10 == finalNumber%10))) {
             getTask();
         }
         else {
