@@ -1,4 +1,3 @@
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,19 +12,20 @@ public class Settings {
     private Integer players;
     private Integer easyTasks;
     private Integer normalTasks;
-    private Integer hardTasks;
+    private Integer timerTasks;
     private Integer imposterKD;
     private Integer impostersCount;
     private Map<Integer,Integer> easyTasksMap = new HashMap<>();
     private Map<Integer,Integer> normalTasksMap = new HashMap<>();
-    private Map<Integer,Integer> hardTasksMap = new HashMap<>();
+    private Map<Integer,Integer> timerTasksMap = new HashMap<>();
     private Map<String, Integer> sabotageSolvers = new HashMap<>();
+    private Map<Integer, Integer> availableTasks = new HashMap<>();
 
-    public Settings(Integer players, Integer easyTasks, Integer normalTasks, Integer hardTasks, Integer imposterKD, Integer impostersCount) {
+    public Settings(Integer players, Integer easyTasks, Integer normalTasks, Integer timerTasks, Integer imposterKD, Integer impostersCount) {
         this.players = players;
         this.easyTasks = easyTasks;
         this.normalTasks = normalTasks;
-        this.hardTasks = hardTasks;
+        this.timerTasks = timerTasks;
         this.imposterKD = imposterKD;
         this.impostersCount = impostersCount;
         makeSabotageSolvers();
@@ -36,7 +36,7 @@ public class Settings {
 
     public int getTask(int task){
         if (task / 10 == 3){
-            return hardTasksMap.get(task % 10);
+            return timerTasksMap.get(task % 10);
         }else if (task / 10 == 2){
             return normalTasksMap.get(task % 10);
         }else{
@@ -96,7 +96,7 @@ public class Settings {
         hardTasksMap.put(7, 7890);
         hardTasksMap.put(8, 8901);
         hardTasksMap.put(9, 9012);
-        this.hardTasksMap = hardTasksMap;
+        this.timerTasksMap = hardTasksMap;
     }
 
     public String getAllSettings(){
@@ -104,9 +104,25 @@ public class Settings {
         str += getPlayers().toString() + " ";
         str += getEasyTasks().toString() + " ";
         str += getNormalTasks().toString() + " ";
-        str += getHardTasks().toString() + " ";
+        str += getTimerTasks().toString() + " ";
         str += getImposterKD().toString() + " ";
         str += getImpostersCount();
         return str;
+    }
+
+    public void removeTask(Integer key){
+        availableTasks.remove(key);
+    }
+
+    public void addTask(Integer key, Integer value){
+        availableTasks.put(key, value);
+
+    }
+
+    public void makeAvailableTasks(){
+        Map<Integer, Integer> availableTasks = new HashMap<>(getEasyTasksMap());
+        availableTasks.putAll(getNormalTasksMap());
+        availableTasks.putAll(getTimerTasksMap());
+        this.availableTasks = availableTasks;
     }
 }

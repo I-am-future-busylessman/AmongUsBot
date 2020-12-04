@@ -64,10 +64,10 @@ public class Keyboards {
 
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add(new KeyboardButton("Получить задание"));
+        keyboardFirstRow.add(new KeyboardButton(":white_check_mark: Получить задание"));
         if (alive) {
             KeyboardRow keyboardSecondRow = new KeyboardRow();
-            keyboardSecondRow.add(new KeyboardButton("Репорт"));
+            keyboardSecondRow.add(new KeyboardButton(":loudspeaker: Репорт"));
             keyboard.add(keyboardSecondRow);
         }
         keyboard.add(keyboardFirstRow);
@@ -83,12 +83,12 @@ public class Keyboards {
 
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add(new KeyboardButton("Саботаж"));
+        keyboardFirstRow.add(new KeyboardButton(":fire: Cаботаж "));
         if(alive) {
             KeyboardRow keyboardSecondRow = new KeyboardRow();
-            keyboardSecondRow.add(new KeyboardButton("Репорт"));
+            keyboardSecondRow.add(new KeyboardButton(":loudspeaker: Репорт "));
             KeyboardRow keyboardThirdRow = new KeyboardRow();
-            keyboardThirdRow.add(new KeyboardButton("Убить"));
+            keyboardThirdRow.add(new KeyboardButton("☠ Убить "));
             keyboard.add(keyboardSecondRow);
             keyboard.add(keyboardThirdRow);
         }
