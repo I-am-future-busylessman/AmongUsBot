@@ -47,6 +47,7 @@ public class Keyboards {
         keyboardFirstRow.add(new KeyboardButton("Голосование"));
         KeyboardRow keyboardSecondRow = new KeyboardRow();
         keyboardSecondRow.add(new KeyboardButton("Воскресить"));
+        keyboardSecondRow.add(new KeyboardButton("Убить"));
         KeyboardRow keyboardThirdRow = new KeyboardRow();
         keyboardThirdRow.add(new KeyboardButton("Перезапуск"));
         keyboard.add(keyboardFirstRow);

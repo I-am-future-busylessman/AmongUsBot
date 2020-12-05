@@ -146,8 +146,20 @@ public class BotCore extends TelegramLongPollingBot {
             report(players.getPlayers().get(0));
         }else if(message.equals("Перезапуск")){
             reboot();
-        }else if(message.equals("Воскресить")
-        ){
+        }else if(message.equals("Убить")){
+            admin.setKill(null);
+            sendMsg(admin.getChatId(), "Кого хотите Убить", Keyboards.votePanel(players));
+        }else if(admin.getKill() == null){
+            User user = players.getPlayerByColor(message);
+            if (user.getAlive()) {
+                user.setAlive(false);
+                sendMsg(user.getChatId(), "Вас убил администратор, подойдите к нему", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+                sendMsg(admin.getChatId(), "Успешно", Keyboards.adminGamePanel());
+            }else{
+                sendMsg(admin.getChatId(), "Он и так мёртв", Keyboards.adminGamePanel());
+            }
+            admin.setMakeAlive("Admin");
+        }else if(message.equals("Воскресить")){
             admin.setMakeAlive(null);
             sendMsg(admin.getChatId(), "Кого хотите воскресить", Keyboards.makeAlive(players));
         }else if(admin.getMakeAlive() == null){
@@ -384,6 +396,7 @@ public class BotCore extends TelegramLongPollingBot {
             gameEnd(false);
         }
     }
+
     public void checkGameEnd(){
         if (players.getPlayers().stream().filter(u -> u.getAlive() && u.getRole()).count() == players.getPlayers().stream().filter(u -> u.getAlive() && !u.getRole()).count()){
             gameEnd(false);
