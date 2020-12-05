@@ -112,8 +112,13 @@ public class BotCore extends TelegramLongPollingBot {
                     //Keyboards.rolePanel(true, true)));
             players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> sendMsg(u.getChatId(),
                     "Ты предатель, тебе доступны такие действия как Убийство и Саботаж." +
-                    "\nУничтож их всех или сломай корабль." +
-                    "\nНе попадись!", Keyboards.rolePanel(false, true)));
+                    "\nУничтожь их всех или сломай корабль." +
+                    "\nНе попадись!" +
+                    "\nВторой предатель" + players.getPlayers().stream().filter(name -> !name.getRole() && !name.getColor().equals(u.getColor())), Keyboards.rolePanel(false, true)));
+
+
+
+
             players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> sendPht(u.getChatId(),
                     "1.png", Keyboards.rolePanel(false, true)));
 

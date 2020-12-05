@@ -75,5 +75,8 @@ public class User {
             activeTask = taskNumber;
         }
     }
+    public String getColor(User user) {
+        return color;
+    }
 }
 
