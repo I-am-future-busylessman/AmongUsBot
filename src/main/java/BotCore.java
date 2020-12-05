@@ -51,9 +51,13 @@ public class BotCore extends TelegramLongPollingBot {
         }else if(gameStatus.equals("game") && players.getUser(chatId).getRole().equals(false)){
             User user = players.getUser(chatId);
             imposterInGame(message, user);
-        }else if(gameStatus.equals("vote") && !players.getUser(chatId).getVoted()){
-            User user = players.getUser(chatId);
-            playersVote(message, user);
+        }else if(gameStatus.equals("vote") && (chatId == admin.getChatId() || !players.getUser(chatId).getVoted())){
+            if(chatId != admin.getChatId()) {
+                User user = players.getUser(chatId);
+                playersVote(message, user);
+            }else{
+                playersVote(message, null);
+            }
         }else{
             sendMsg(chatId, "Неизвестная команда", null);
         }
@@ -447,6 +451,7 @@ public class BotCore extends TelegramLongPollingBot {
                             "\nПройдите к администратору.", Keyboards.votePanel(players));
                 }
             }
+            sendMsg(admin.getChatId(), "Начинается собрание!", Keyboards.adminVotePanel());
             someoneKilled = false;
             redButton = false;
         }else{
@@ -455,14 +460,18 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     public void playersVote(String message, User user){
-        if (voteResults.containsKey(message)){
-            voteResults.replace(message, voteResults.get(message) + 1);
-        }else{
-            voteResults.put(message, 1);
+        if(user != null) {
+            if (players.getPlayers().stream().anyMatch(u -> u.getColor().equals(message) && u.getAlive()) || message.equals("Пропустить")) {
+                if (voteResults.containsKey(message)) {
+                    voteResults.replace(message, voteResults.get(message) + 1);
+                } else {
+                    voteResults.put(message, 1);
+                }
+                user.setVoted(true);
+                voted++;
+            }
         }
-        user.setVoted(true);
-        voted++;
-        if (voted == players.countAlive()){
+        if (voted == players.countAlive() || message.equals("Завершить голосование")){
             gameStatus = "game";
             int maxValueInMap=(Collections.max(voteResults.values()));
             ArrayList<String> killed = new ArrayList<>();
