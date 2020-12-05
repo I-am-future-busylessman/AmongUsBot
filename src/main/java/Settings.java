@@ -46,56 +46,42 @@ public class Settings {
 
     public void makeSabotageSolvers() {
         Map<String, Integer> sabotageTypes = new HashMap<>();
-        sabotageTypes.put("Свет", 2020);
-        sabotageTypes.put("Реактор", 3030);
-        sabotageTypes.put("Связь", 4040);
-        sabotageTypes.put("Кислород", 1010);
+        sabotageTypes.put("Свет", 443355);
+        sabotageTypes.put("Реактор", 915677);
+        sabotageTypes.put("Связь", 784212);
+        sabotageTypes.put("Кислород", 672459);
         sabotageSolvers = sabotageTypes;
 
     }
 
     public void makeEasyTasks(){
         Map<Integer,Integer> easyTasksMap = new HashMap<>();
-        easyTasksMap.put(0, 1000);
-        easyTasksMap.put(1, 1111);
-        easyTasksMap.put(2, 2222);
-        easyTasksMap.put(3, 3333);
-        easyTasksMap.put(4, 4444);
-        easyTasksMap.put(5, 5555);
-        easyTasksMap.put(6, 6666);
-        easyTasksMap.put(7, 7777);
-        easyTasksMap.put(8, 8888);
-        easyTasksMap.put(9, 9999);
+        easyTasksMap.put(5, 9632);//ловец
+        easyTasksMap.put(6, 63);//бэт
+        easyTasksMap.put(7, 9475);//холл
+        easyTasksMap.put(8, 6951);//лабиринт
         this.easyTasksMap = easyTasksMap;
     }
 
     public void makeNormalTasks(){
         Map<Integer,Integer> normalTasksMap = new HashMap<>();
-        normalTasksMap.put(0, 1101);
-        normalTasksMap.put(1, 1212);
-        normalTasksMap.put(2, 2323);
-        normalTasksMap.put(3, 3434);
-        normalTasksMap.put(4, 4545);
-        normalTasksMap.put(5, 5656);
-        normalTasksMap.put(6, 6767);
-        normalTasksMap.put(7, 7878);
-        normalTasksMap.put(8, 8989);
-        normalTasksMap.put(9, 9090);
+        normalTasksMap.put(5, 4779);//маньяк
+        normalTasksMap.put(6, 46);//бэт
+        normalTasksMap.put(7, 7563);//диваны за шторами
+        normalTasksMap.put(8, 1484);//лабиринт
+        normalTasksMap.put(9, 7301);
         this.normalTasksMap = normalTasksMap;
     }
 
     public void makeHardTasks(){
         Map<Integer,Integer> hardTasksMap = new HashMap<>();
-        hardTasksMap.put(0, 1123);
-        hardTasksMap.put(1, 1234);
-        hardTasksMap.put(2, 2345);
-        hardTasksMap.put(3, 3456);
-        hardTasksMap.put(4, 4567);
-        hardTasksMap.put(5, 5678);
-        hardTasksMap.put(6, 6789);
-        hardTasksMap.put(7, 7890);
-        hardTasksMap.put(8, 8901);
-        hardTasksMap.put(9, 9012);
+        hardTasksMap.put(0, 8713);//
+        hardTasksMap.put(1, 4);//
+        hardTasksMap.put(3, 6983);//колонка
+        hardTasksMap.put(5, 1457);//лабиринт второй этаж
+        hardTasksMap.put(6, 16);//раздевалка
+        hardTasksMap.put(7, 9231);//раздевалка корридор
+        hardTasksMap.put(8, 3396);//ловец
         this.timerTasksMap = hardTasksMap;
     }
 
@@ -111,18 +97,20 @@ public class Settings {
     }
 
     public void removeTask(Integer key){
-        availableTasks.remove(key);
+        timerTasksMap.remove(key);
     }
 
     public void addTask(Integer key, Integer value){
-        availableTasks.put(key, value);
+        timerTasksMap.put(key, value);
 
     }
 
-    public void makeAvailableTasks(){
-        Map<Integer, Integer> availableTasks = new HashMap<>(getEasyTasksMap());
-        availableTasks.putAll(getNormalTasksMap());
-        availableTasks.putAll(getTimerTasksMap());
-        this.availableTasks = availableTasks;
+    public boolean checkAvailableTasks(Integer number){
+        if (number/10 == 1)
+            return easyTasksMap.containsKey(number%10);
+        else if (number/10 == 2)
+            return normalTasksMap.containsKey(number%10);
+        else
+            return timerTasksMap.containsKey(number%10);
     }
 }

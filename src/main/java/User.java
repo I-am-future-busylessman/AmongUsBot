@@ -8,7 +8,7 @@ import java.util.List;
 @Setter
 
 public class User {
-    private int activeTask;
+    private int activeTask = 0;
     private Boolean role;
     private Long chatId;
     private String color = null;
@@ -68,8 +68,7 @@ public class User {
                 }
             }
         }
-        int finalNumber = taskNumber;
-        if (complitedTasks.size() < totalTasks && (taskNumber == 0 || complitedTasks.stream().anyMatch(u -> u%10 == finalNumber%10))) {
+        if (complitedTasks.size() < totalTasks && taskNumber == 0 ) {
             getTask();
         }
         else {
