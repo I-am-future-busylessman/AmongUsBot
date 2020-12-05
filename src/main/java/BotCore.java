@@ -211,7 +211,7 @@ public class BotCore extends TelegramLongPollingBot {
             System.out.println(user.getActiveTask());
             user.setActiveTask(0);
             sendMsg(user.getChatId(), texts.getCompletingTaskTexts().get((int)(Math.random()*100)%3), Keyboards.rolePanel(user.getRole(), user.getAlive()));
-            checkGameEnd();
+            checkGameEndByTasks();
         }else if (message.equals("Убить")){
             sendMsg(user.getChatId(), "Ты был избранником!" +
                     "\nПредрекали что ты уничтожишь ситхов, а не примкнёшь к ним." +
@@ -296,7 +296,7 @@ public class BotCore extends TelegramLongPollingBot {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        checkGameEnd();
+                        checkGameEndBySabotage();
                     });
                 }else if(message.equals("Кислород")){
                     Executors.newCachedThreadPool().submit(() -> {
@@ -326,7 +326,7 @@ public class BotCore extends TelegramLongPollingBot {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        checkGameEnd();
+                        checkGameEndBySabotage();
                     });
                 }
                 sendMsg(admin.getChatId(), "Сломай " + message, Keyboards.adminGamePanel());
@@ -373,14 +373,21 @@ public class BotCore extends TelegramLongPollingBot {
         }
     }
 
-    public void checkGameEnd(){
+    public void checkGameEndByTasks() {
+        if(players.getPlayers().stream().filter(User::getRole).filter(u -> u.getComplitedTasks().size() == u.totalTasks).count() == settings.getPlayers() - settings.getImpostersCount()){
+            gameEnd(true);
+        }
+    }
+
+    public void checkGameEndBySabotage() {
         if (sabotageStatus && (sabotage.equals("Реактор") || sabotage.equals("Кислород"))){
             gameEnd(false);
-        }else if(players.getPlayers().stream().filter(u -> u.getAlive() && u.getRole()).count() == players.getPlayers().stream().filter(u -> u.getAlive() && !u.getRole()).count()){
+        }
+    }
+    public void checkGameEnd(){
+        if (players.getPlayers().stream().filter(u -> u.getAlive() && u.getRole()).count() == players.getPlayers().stream().filter(u -> u.getAlive() && !u.getRole()).count()){
             gameEnd(false);
         }else if(players.getPlayers().stream().noneMatch(u -> !u.getRole() && u.getAlive())) {
-            gameEnd(true);
-        }else if(players.getPlayers().stream().filter(User::getRole).filter(u -> u.getComplitedTasks().size() == u.totalTasks).count() == settings.getPlayers() - settings.getImpostersCount()){
             gameEnd(true);
         }
     }
