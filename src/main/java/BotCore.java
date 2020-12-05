@@ -235,7 +235,9 @@ public class BotCore extends TelegramLongPollingBot {
                     "\nВосстановишь равновесие силы, а не ввергнешь её во мрак!", Keyboards.rolePanel(user.getRole(), user.getAlive()));
         }else if (sabotageStatus && Integer.parseInt(message) > 0){
             checkSabotage(message, user);
-        }else{
+        }
+
+         else{
             sendMsg(user.getChatId(), "Неизвестная команда", Keyboards.rolePanel(user.getRole(), user.getAlive()));
         }
     }
