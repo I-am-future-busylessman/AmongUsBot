@@ -240,7 +240,9 @@ public class BotCore extends TelegramLongPollingBot {
         }else if (sabotageStatus && Integer.parseInt(message) > 0){
             checkSabotage(message, user);
         }
-
+        else if (user.getActiveTask() != 0 && Integer.parseInt(message) != settings.getTask(user.getActiveTask())){
+            sendMsg(user.getChatId(), "Неверный код задания", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+        }
          else{
             sendMsg(user.getChatId(), "Неизвестная команда", Keyboards.rolePanel(user.getRole(), user.getAlive()));
         }
