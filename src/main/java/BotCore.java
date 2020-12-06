@@ -529,8 +529,8 @@ public class BotCore extends TelegramLongPollingBot {
             checkGameEnd();
             //кнопка не может использоваться в течение минуты
             redButtonReady = false;
-            //начинается поток для кнопки
-            Runnable redButtonThread = () -> {
+            //начинается поток для кнопки (написан так же, как и в саботаже)
+            Executors.newCachedThreadPool().submit(() -> {
                 try {
                     //поток ждет минуту
                     Thread.sleep(60000);
@@ -538,13 +538,15 @@ public class BotCore extends TelegramLongPollingBot {
                     redButtonReady = true;
                     //Сообщение админу о начале работы кнопки
                     sendMsg(admin.getChatId(), "Кнопка экстренного собрания активна", Keyboards.adminGamePanel());
+                    //Сообщение игрокам о начале работы кнопки
+                    for (int i = 0; i < players.getPlayers().size(); i++){
+                            sendMsg(players.getPlayers().get(i).getChatId(), "Кнопка экстренного собрания активна" , Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     System.out.println("Ошибка в потоке кнопки");
                 }
-            };
-            Thread redbutton = new Thread(redButtonThread);
-            redbutton.start();
+            });
             //Конец потока кнопки
         }
     }
