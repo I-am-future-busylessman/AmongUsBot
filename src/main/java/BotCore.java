@@ -28,6 +28,7 @@ public class BotCore extends TelegramLongPollingBot {
     HashMap<String, Integer> voteResults = new HashMap<>();
     private Settings settings = new Settings(10, 2, 2, 3, 30, 2);
     boolean redButton = false;
+    volatile boolean redButtonReady = true;
     TaskText taskText = new TaskText();
 
     String[] subStr;
@@ -442,30 +443,35 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     public void report(User user){
-        if (someoneKilled || redButton) {
-            sabotageStatus = false;
-            gameStatus = "vote";
-            for (int i = 0; i < players.getPlayers().size(); i++) {
-                if (players.getPlayers().get(i).getAlive()) {
-                    if (someoneKilled){
-                        //sendPht(players.getPlayers().get(i).getChatId(), "6.png", Keyboards.votePanel(players));
-                        sendMsg(players.getPlayers().get(i).getChatId(), texts.getReportTexts().get((int)(Math.random()*100)%3),Keyboards.votePanel(players));
+        if (redButtonReady) {
+            if (someoneKilled || redButton) {
+                sabotageStatus = false;
+                gameStatus = "vote";
+                for (int i = 0; i < players.getPlayers().size(); i++) {
+                    if (players.getPlayers().get(i).getAlive()) {
+                        if (someoneKilled) {
+                            //sendPht(players.getPlayers().get(i).getChatId(), "6.png", Keyboards.votePanel(players));
+                            sendMsg(players.getPlayers().get(i).getChatId(), texts.getReportTexts().get((int) (Math.random() * 100) % 3), Keyboards.votePanel(players));
+                        } else {
+                            //sendPht(players.getPlayers().get(i).getChatId(), "7.png", Keyboards.votePanel(players));
+                            sendMsg(players.getPlayers().get(i).getChatId(), texts.getReportTexts().get((int) (Math.random() * 100) % 2), Keyboards.votePanel(players));
+                        }
+                    } else {
+                        sendMsg(players.getPlayers().get(i).getChatId(), "Собрание! \n Но вы мертвы и не голосуете." +
+                                "\nПройдите к администратору.", Keyboards.votePanel(players));
                     }
-                    else{
-                        //sendPht(players.getPlayers().get(i).getChatId(), "7.png", Keyboards.votePanel(players));
-                        sendMsg(players.getPlayers().get(i).getChatId(), texts.getReportTexts().get((int)(Math.random()*100)%2),Keyboards.votePanel(players));
-                    }
-                } else {
-                    sendMsg(players.getPlayers().get(i).getChatId(), "Собрание! \n Но вы мертвы и не голосуете." +
-                            "\nПройдите к администратору.", Keyboards.votePanel(players));
                 }
+                sendMsg(admin.getChatId(), "Начинается собрание!", Keyboards.adminVotePanel());
+                someoneKilled = false;
+                redButton = false;
+            } else {
+                sendMsg(user.getChatId(), "Трупа нет, ты врёшь", Keyboards.rolePanel(user.getRole(), user.getAlive()));
             }
-            sendMsg(admin.getChatId(), "Начинается собрание!", Keyboards.adminVotePanel());
-            someoneKilled = false;
-            redButton = false;
-        }else{
-            sendMsg(user.getChatId(), "Трупа нет, ты врёшь", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+            //если кнопка не работает
+        } else {
+            sendMsg(user.getChatId(), "Кнопка еще не готова", Keyboards.rolePanel(user.getRole(), user.getAlive()));
         }
+
     }
 
     public void playersVote(String message, User user){
@@ -515,6 +521,25 @@ public class BotCore extends TelegramLongPollingBot {
             voted = 0;
             voteResults = new HashMap<>();
             checkGameEnd();
+            //кнопка не может использоваться в течение минуты
+            redButtonReady = false;
+            //начинается поток для кнопки
+            Runnable redButtonThread = () -> {
+                try {
+                    //поток ждет минуту
+                    Thread.sleep(60000);
+                    //делаем кнопку работоспособной
+                    redButtonReady = true;
+                    //Сообщение админу о начале работы кнопки
+                    sendMsg(admin.getChatId(), "Кнопка экстренного собрания активна", Keyboards.adminGamePanel());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    System.out.println("Ошибка в потоке кнопки");
+                }
+            };
+            Thread redbutton = new Thread(redButtonThread);
+            redbutton.start();
+            //Конец потока кнопки
         }
     }
 
