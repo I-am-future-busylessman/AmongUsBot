@@ -67,13 +67,13 @@ public class BotCore extends TelegramLongPollingBot {
         if (message.compareTo("/start") == 0) {
             sendMsg(admin.getChatId(), "Здравствуй, администратор", Keyboards.adminStartPanel());
         }else if (message.compareTo("Настройки") == 0){
-            sendMsg(admin.getChatId(), "Введите настройки в следующем формате: " +
-                    "\n/set количество_игроков " +
-                    "количество_простых_заданий " +
-                    "количество_средних " +
-                    "количество_сложных " +
-                    "кд_убийцы " +
-                    "количество_убийц", null);
+            sendMsg(admin.getChatId(), "Введите следующие настройки через пробел: \n" +
+                    "/set количество игроков " +
+                    "количество простых заданий " +
+                    "количество средних " +
+                    "количество сложных " +
+                    "кд убийцы " +
+                    "количество убийц", null);
         }else if (message.length() > 4 && message.substring(0, 4).compareTo("/set") == 0){
             subStr = message.split(" ");
             settings.setPlayers(Integer.valueOf(subStr[1]));
