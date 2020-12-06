@@ -152,8 +152,13 @@ public class BotCore extends TelegramLongPollingBot {
 
     public void adminInGame(String message){
         if (message.equals("Голосование")){
-            redButton = true;
-            report(players.getPlayers().get(0));
+            //проверяем, работает ли кнопка
+            if (redButtonReady) {
+                redButton = true;
+                report(players.getPlayers().get(0));
+            } else {
+                sendMsg(admin.getChatId(), "Кнопка экстренного собрания еще не готова", Keyboards.adminGamePanel());
+            }
         }else if(message.equals("Перезапуск")){
             reboot();
         }else if(message.equals("Убить")){
@@ -443,7 +448,8 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     public void report(User user){
-        if (redButtonReady) {
+        //проверяем, работает ли кнопка или кого-то убили
+        if (redButtonReady || someoneKilled) {
             if (someoneKilled || redButton) {
                 sabotageStatus = false;
                 gameStatus = "vote";
