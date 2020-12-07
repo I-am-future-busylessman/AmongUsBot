@@ -121,7 +121,8 @@ public class BotCore extends TelegramLongPollingBot {
                     "\nНе попадись!" +
                     "\nВторой предатель" + players.getPlayers().stream().filter(name -> !name.getRole() && !name.getColor().equals(u.getColor())), Keyboards.rolePanel(false, true)));
 
-
+            //Отправляем сообщения администратору о том, кто предатели в игре
+            sendMsg(admin.getChatId(), "Предатели: " + players.getPlayers().stream().filter(u -> !u.getRole()) + " ", Keyboards.adminStartPanel());
 
 
             players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> sendPht(u.getChatId(),
@@ -208,6 +209,10 @@ public class BotCore extends TelegramLongPollingBot {
             }
             if (user.getActiveTask() == 0){
                 sendMsg(user.getChatId(), "Ты уже всё сделал", Keyboards.rolePanel(true, user.getAlive()));
+
+                // отправляем сообщение админу о том, что пользователь сделал все задания
+                sendMsg(admin.getChatId(), "Игрок " + user.getColor() + " выполнил все задания!", Keyboards.adminGamePanel());
+
             }else {
                 sendMsg(user.getChatId(),
                         texts.getSendingTaskTexts().get((int)(Math.random()*100)%3) + user.getActiveTask() +"\n" + taskText.getTask().get(user.getActiveTask()),
@@ -426,6 +431,8 @@ public class BotCore extends TelegramLongPollingBot {
 
     public void gameEnd(boolean winners){
         gameStatus = "init";
+        //Отправляем сообщение админу о том, кто выиграл (оставил эту клавиатуру так как далее идет ребут)
+        sendMsg(admin.getChatId(), winners ? "Конец игры\nПобедил экипаж" : "Конец игры\nПобедили предатели", Keyboards.adminGamePanel());
         for (int i = 0; i < players.getPlayers().size(); i++){
             if(players.getPlayers().get(i).getRole()){
                 sendMsg(players.getPlayers().get(i).getChatId(), winners ? "Поздравляем вы победили": "В этот раз победа за предателями", Keyboards.startPanel());
@@ -508,6 +515,9 @@ public class BotCore extends TelegramLongPollingBot {
                     for (int i = 0; i < players.getPlayers().size(); i++) {
                         if (!players.getPlayers().get(i).getColor().equals(killed.get(0))) {
                             sendMsg(players.getPlayers().get(i).getChatId(), "Вы выкинули " + killed.get(0), Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                            //Отправляем сообщение админу о том, кто был выкинут в ходе голосования
+                            sendMsg(admin.getChatId(), "Голосование завершено\nИгрок " + killed.get(0) + " был выкинут в ходе голосования", Keyboards.adminGamePanel());
+
                         } else {
                             sendMsg(players.getPlayers().get(i).getChatId(), "К сожалению вас выкинули." +
                                     "\nПройдите к администратору.", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
