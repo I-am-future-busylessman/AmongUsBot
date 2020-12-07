@@ -249,10 +249,10 @@ public class BotCore extends TelegramLongPollingBot {
             else {
                 user.setHardTasks(user.getHardTasks() - 1);
                 taskCooldown.put(user.getActiveTask(), settings.getAvailableTasks().get(user.getActiveTask()));
-                if (user.getActiveTask() != 30)
+                if (user.getActiveTask() != 31)
                     sendMsg(admin.getChatId(), "Задание номер " + user.getActiveTask() + " нужно обновить", Keyboards.adminGamePanel());
                 settings.removeTask(user.getActiveTask());
-                if (user.getActiveTask() == 30) {
+                if (user.getActiveTask() == 31) {
                     sendMsg(admin.getChatId(), "Стрельба начинает перезарядку", Keyboards.adminGamePanel());
                     Executors.newCachedThreadPool().submit(() -> {
                         try {
@@ -260,8 +260,8 @@ public class BotCore extends TelegramLongPollingBot {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        settings.addTask(30, taskCooldown.get(30));
-                        taskCooldown.remove(30);
+                        settings.addTask(31, taskCooldown.get(30));
+                        taskCooldown.remove(31);
                         sendMsg(admin.getChatId(), "Стрельба перезаряжена", Keyboards.adminGamePanel());
                     });
                 }
