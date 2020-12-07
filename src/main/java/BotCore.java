@@ -30,6 +30,8 @@ public class BotCore extends TelegramLongPollingBot {
     boolean redButton = false;
     volatile boolean redButtonReady = true;
     TaskText taskText = new TaskText();
+    HashMap<Integer, Integer> taskCooldown = new HashMap<>();
+    boolean taskUpdate = false;
 
     String[] subStr;
     int voted = 0;
@@ -44,7 +46,7 @@ public class BotCore extends TelegramLongPollingBot {
         }else if(gameStatus.equals("init") && !(chatId == admin.getChatId())){
             User user = players.getUser(chatId);
             userBeforeStart(update, message, user);
-        }else if(((gameStatus.equals("game")) || (gameStatus.equals("vote"))) && chatId == admin.getChatId()){
+        }else if(gameStatus.equals("game") && chatId == admin.getChatId()){
             adminInGame(message);
         }else if (gameStatus.equals("game") && players.getUser(chatId).getRole().equals(true)){
             User user = players.getUser(chatId);
@@ -152,7 +154,18 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     public void adminInGame(String message){
-        if (message.equals("Голосование")){
+        if (taskUpdate){
+            if (taskCooldown.containsKey(Integer.getInteger(message))){
+                settings.addTask(Integer.getInteger(message), taskCooldown.get(Integer.getInteger(message)));
+                taskCooldown.remove(Integer.getInteger(message));
+                sendMsg(admin.getChatId(), "Задание успешно обновлено", Keyboards.adminGamePanel());
+                taskUpdate = false;
+            }
+            else {
+                taskUpdate = false;
+                sendMsg(admin.getChatId(), "Это задание уже обновлено", Keyboards.adminGamePanel());
+            }
+        }else if (message.equals("Голосование")){
             //проверяем, работает ли кнопка
             if (redButtonReady) {
                 redButton = true;
@@ -188,6 +201,13 @@ public class BotCore extends TelegramLongPollingBot {
                 sendMsg(admin.getChatId(), "Он и так жив", Keyboards.adminGamePanel());
             }
             admin.setMakeAlive("Admin");
+        }else if(message.equals("Обновить задание")){
+            if (taskCooldown.size() > 0) {
+                sendMsg(admin.getChatId(), "Какое задание вы хотите обновить?", Keyboards.taskUpdate(taskCooldown.keySet()));
+                taskUpdate = true;
+            }
+            else
+                sendMsg(admin.getChatId(), "Все задания активны", Keyboards.adminGamePanel());
         }else{
             sendMsg(admin.getChatId(), "Неизвестная команда", null);
         }
@@ -228,17 +248,23 @@ public class BotCore extends TelegramLongPollingBot {
                 user.setNormalTasks(user.getNormalTasks() - 1);
             else {
                 user.setHardTasks(user.getHardTasks() - 1);
-                Executors.newCachedThreadPool().submit(() -> {
-                    int taskValue = settings.getAvailableTasks().get(user.getActiveTask());
-                    int taskKey = user.getActiveTask();
-                    settings.removeTask(taskKey);
-                    try {
-                        Thread.sleep(300000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    settings.addTask(taskKey, taskValue);
-                });
+                taskCooldown.put(user.getActiveTask(), settings.getAvailableTasks().get(user.getActiveTask()));
+                if (user.getActiveTask() != 30)
+                    sendMsg(admin.getChatId(), "Задание номер " + user.getActiveTask() + " нужно обновить", Keyboards.adminGamePanel());
+                settings.removeTask(user.getActiveTask());
+                if (user.getActiveTask() == 30) {
+                    sendMsg(admin.getChatId(), "Стрельба начинает перезарядку", Keyboards.adminGamePanel());
+                    Executors.newCachedThreadPool().submit(() -> {
+                        try {
+                            Thread.sleep(360000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        settings.addTask(30, taskCooldown.get(30));
+                        taskCooldown.remove(30);
+                        sendMsg(admin.getChatId(), "Стрельба перезаряжена", Keyboards.adminGamePanel());
+                    });
+                }
             }
             System.out.println(user.getActiveTask());
             user.setActiveTask(0);

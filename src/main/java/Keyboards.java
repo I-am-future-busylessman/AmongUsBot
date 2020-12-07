@@ -5,6 +5,7 @@ import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class Keyboards {
 
@@ -50,9 +51,26 @@ public class Keyboards {
         keyboardSecondRow.add(new KeyboardButton("Убить"));
         KeyboardRow keyboardThirdRow = new KeyboardRow();
         keyboardThirdRow.add(new KeyboardButton("Перезапуск"));
+        KeyboardRow keyboardFourthRow = new KeyboardRow();
+        keyboardFourthRow.add(new KeyboardButton("Обновить задание"));
         keyboard.add(keyboardFirstRow);
         keyboard.add(keyboardSecondRow);
         keyboard.add(keyboardThirdRow);
+        keyboard.add(keyboardFourthRow);
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
+    }
+
+    public static ReplyKeyboardMarkup taskUpdate(Set<Integer> taskKeys){
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        KeyboardRow keyboardFirstRow = new KeyboardRow();
+        taskKeys.forEach(u -> keyboardFirstRow.add(new KeyboardButton(u.toString())));
+        keyboard.add(keyboardFirstRow);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
