@@ -18,11 +18,8 @@ public class PlayersList{
     }
 
     public User getPlayerByColor(String color){
-        color = color.toLowerCase();
-        String finalColor = color;
-        if(players.stream().anyMatch(u -> u.getColor().equals(finalColor))) {
-            String finalColor1 = color;
-            return players.stream().filter(u -> u.getColor().equals(finalColor1)).findFirst().orElse(null);
+        if(players.stream().anyMatch(u -> u.getColor().equals(color))) {
+            return players.stream().filter(u -> u.getColor().equals(color)).findFirst().orElse(null);
         }
         return null;
     }
