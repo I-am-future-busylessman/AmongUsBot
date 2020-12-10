@@ -2,8 +2,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -18,8 +17,12 @@ public class Settings {
     private Map<Integer,Integer> easyTasksMap = new HashMap<>();
     private Map<Integer,Integer> normalTasksMap = new HashMap<>();
     private Map<Integer,Integer> timerTasksMap = new HashMap<>();
-    private Map<String, Integer> sabotageSolvers = new HashMap<>();
+    private ArrayList<Integer> lightSolvers = new ArrayList<>();
+    private ArrayList<Integer> reactorSolvers = new ArrayList<>();
+    private ArrayList<Integer> oxygenSolvers = new ArrayList<>();
+    private ArrayList<Integer> networkSolvers = new ArrayList<>();
     private Map<Integer, Integer> availableTasks = new HashMap<>();
+    public Map<String, ArrayList<Integer>> sabotageSolvers = new HashMap<>();
 
     public Settings(Integer players, Integer easyTasks, Integer normalTasks, Integer timerTasks, Integer imposterKD, Integer impostersCount) {
         this.players = players;
@@ -45,43 +48,68 @@ public class Settings {
     }
 
     public void makeSabotageSolvers() {
-        Map<String, Integer> sabotageTypes = new HashMap<>();
-        sabotageTypes.put("Свет", 443355);
-        sabotageTypes.put("Реактор", 915677);
-        sabotageTypes.put("Связь", 784212);
-        sabotageTypes.put("Кислород", 672459);
-        sabotageSolvers = sabotageTypes;
-
+        lightSolvers.add(880055);
+        lightSolvers.add(312456);
+        lightSolvers.add(784212);
+        lightSolvers.add(443355);
+        lightSolvers.add(915677);
+        reactorSolvers.add(972830);
+        reactorSolvers.add(672459);
+        reactorSolvers.add(840981);
+        reactorSolvers.add(123123);
+        reactorSolvers.add(101010);
+        oxygenSolvers.add(231231);
+        oxygenSolvers.add(141315);
+        oxygenSolvers.add(965439);
+        oxygenSolvers.add(902930);
+        oxygenSolvers.add(145367);
+        networkSolvers.add(324325);
+        networkSolvers.add(495343);
+        networkSolvers.add(123453);
+        networkSolvers.add(114325);
+        networkSolvers.add(774459);
+        sabotageSolvers.put("Свет", lightSolvers);
+        sabotageSolvers.put("Реактор", reactorSolvers);
+        sabotageSolvers.put("Кислород", oxygenSolvers);
+        sabotageSolvers.put("Связь", networkSolvers);
     }
 
     public void makeEasyTasks(){
         Map<Integer,Integer> easyTasksMap = new HashMap<>();
-        easyTasksMap.put(5, 9632);//ловец
-        easyTasksMap.put(6, 63);//бэт
-        easyTasksMap.put(7, 9475);//холл
-        easyTasksMap.put(8, 6951);//лабиринт
+        easyTasksMap.put(0, 0);//вписать новый код
+        easyTasksMap.put(2, 6941);
+        easyTasksMap.put(3, 4571);
+        easyTasksMap.put(4, 9783);
+        easyTasksMap.put(5, 0);//вписать новый код
+        easyTasksMap.put(6, 3);
+        easyTasksMap.put(7, new Date().getHours()*100 + new Date().getMinutes());
         this.easyTasksMap = easyTasksMap;
     }
 
     public void makeNormalTasks(){
         Map<Integer,Integer> normalTasksMap = new HashMap<>();
-        normalTasksMap.put(5, 4779);//маньяк
-        normalTasksMap.put(6, 46);//бэт
-        normalTasksMap.put(7, 7563);//диваны за шторами
-        normalTasksMap.put(8, 1484);//лабиринт
-        normalTasksMap.put(9, 7301);
+        normalTasksMap.put(0, 9475);
+        normalTasksMap.put(1, 3915);
+        normalTasksMap.put(2, 32);
+        normalTasksMap.put(3, 9039);
+        normalTasksMap.put(4, 0);//вписать новый код
+        normalTasksMap.put(5, 2147);
+        normalTasksMap.put(6, 9120);
+        normalTasksMap.put(7, 27);
+        normalTasksMap.put(8, 8160);
         this.normalTasksMap = normalTasksMap;
     }
 
     public void makeHardTasks(){
         Map<Integer,Integer> hardTasksMap = new HashMap<>();
-        hardTasksMap.put(0, 8713);//
+        hardTasksMap.put(0, 2756);//
         hardTasksMap.put(1, 4);//
-        hardTasksMap.put(3, 6983);//колонка
-        hardTasksMap.put(5, 1457);//лабиринт второй этаж
-        hardTasksMap.put(6, 16);//раздевалка
-        hardTasksMap.put(7, 9231);//раздевалка корридор
-        hardTasksMap.put(8, 3396);//ловец
+        hardTasksMap.put(2, 7361);
+        hardTasksMap.put(3, 4);
+        hardTasksMap.put(4, 4);
+        hardTasksMap.put(5, 0);//вписать новый код
+        hardTasksMap.put(7, new Date().getHours()*100 + new Date().getMinutes());
+        hardTasksMap.put(8, 0);//вписать новый код
         this.timerTasksMap = hardTasksMap;
     }
 
