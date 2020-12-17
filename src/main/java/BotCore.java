@@ -9,7 +9,6 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -27,7 +26,7 @@ public class BotCore extends TelegramLongPollingBot {
     boolean someoneKilled = false;
     boolean sabotageStatus = false;
     HashMap<String, Integer> voteResults = new HashMap<>();
-    private Settings settings = new Settings(5, 2, 2, 3, 30, 2);
+    private Settings settings = new Settings(9, 2, 2, 1, 30, 2);
     boolean redButton = false;
     volatile boolean redButtonReady = true;
     TaskText taskText = new TaskText();
@@ -113,11 +112,6 @@ public class BotCore extends TelegramLongPollingBot {
             players.getPlayers().stream().filter(User::getRole).forEach(u -> sendMsg(u.getChatId(),
                     "Ты член экипажа, твоя задача выполнять задания и вычислять убийц",
                     Keyboards.rolePanel(true, true)));
-            //players.getPlayers().stream().filter(User::getRole).forEach(u -> sendPht(u.getChatId(),
-                    //settings.getImpostersCount() == 1? "2.png"
-                      //      :settings.getImpostersCount() == 2? "3.png"
-                        //    : "4.png",
-                    //Keyboards.rolePanel(true, true)));
             ArrayList<String> names = new ArrayList<>();
             final int imposterCount = settings.getImpostersCount();
             players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> players.getPlayers().stream().filter(name -> !name.getRole() && !name.getColor().equals(u.getColor())).forEach(p -> names.add(p.getColor())));
@@ -128,9 +122,6 @@ public class BotCore extends TelegramLongPollingBot {
             //Отправляем сообщения администратору о том, кто предатели в игре
             if (imposterCount > 1)
                 sendMsg(admin.getChatId(), "Предатели: " + String.join(" ", names), Keyboards.adminGamePanel());
-            players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> sendPht(u.getChatId(),
-                    "1.png", Keyboards.rolePanel(false, true)));
-
         }else {
             sendMsg(admin.getChatId(), "Неизвестная команда", Keyboards.adminStartPanel());
         }
@@ -145,8 +136,8 @@ public class BotCore extends TelegramLongPollingBot {
             user.setAlive(true);
             user.setVoted(false);
             System.out.println("Добален " + user.getColor() + " игрок");
-            sendMsg(user.getChatId(), texts.getHelloTexts().get((int)(Math.random()*100)%3) + user.getColor(), null);
-            if(players.getPlayers().stream().filter(u -> u.getColor() != null).count() == settings.getPlayers()){
+            sendMsg(user.getChatId(), texts.getHelloTexts().get((int) (Math.random() * 100) % 3) + user.getColor(), null);
+            if (players.getPlayers().stream().filter(u -> u.getColor() != null).count() == settings.getPlayers()) {
                 sendMsg(admin.getChatId(), "Команда укомплектована, можно начинать", Keyboards.adminStartPanel());
             }
         }else {
@@ -157,7 +148,7 @@ public class BotCore extends TelegramLongPollingBot {
     public void adminInGame(String message){
         if (taskUpdate){
             if (taskCooldown.containsKey(Integer.getInteger(message.split(" ")[0]))){
-                settings.addTask(Integer.getInteger(message.split(" ")[0]), Integer.getInteger(message.split(" ")[1]));
+                settings.addTask(Integer.getInteger(message.split(" ")[0]), message.split(" ")[1]);
                 taskCooldown.remove(Integer.getInteger(message.split(" ")[0]));
                 sendMsg(admin.getChatId(), "Задание успешно обновлено", Keyboards.adminGamePanel());
                 taskUpdate = false;
@@ -240,11 +231,10 @@ public class BotCore extends TelegramLongPollingBot {
                         texts.getSendingTaskTexts().get((int)(Math.random()*100)%3) + user.getActiveTask() +"\n" + taskText.getTask().get(user.getActiveTask()),
                         Keyboards.rolePanel(user.getRole(), user.getAlive()));
             }
-        }else if (message.equals("Репорт") && user.getAlive()) {
+        }else if (message.equals("Репорт") && user.getAlive()){
             report(user);
         }else if (user.getActiveTask() != 0 &&
-                (Integer.parseInt(message) == settings.getTask(user.getActiveTask())
-                        || (user.getActiveTask()%10 == 7 && Math.abs(Integer.parseInt(message) - new Date().getHours()*100 + new Date().getMinutes()) < 3))){
+                (message.equals(settings.getTask(user.getActiveTask())))){
             user.getComplitedTasks().add(user.getActiveTask());
             if(user.getActiveTask()/10 == 1)
                 user.setEasyTasks(user.getEasyTasks() - 1);
@@ -252,23 +242,6 @@ public class BotCore extends TelegramLongPollingBot {
                 user.setNormalTasks(user.getNormalTasks() - 1);
             else {
                 user.setHardTasks(user.getHardTasks() - 1);
-                taskCooldown.put(user.getActiveTask(), settings.getAvailableTasks().get(user.getActiveTask()));
-                if (user.getActiveTask() == 30)
-                    sendMsg(admin.getChatId(), "Задание номер " + user.getActiveTask() + " нужно обновить", Keyboards.adminGamePanel());
-                settings.removeTask(user.getActiveTask());
-                if (user.getActiveTask() == 31) {
-                    sendMsg(admin.getChatId(), "Стрельба начинает перезарядку", Keyboards.adminGamePanel());
-                    Executors.newCachedThreadPool().submit(() -> {
-                        try {
-                            Thread.sleep(360000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        settings.addTask(31, taskCooldown.get(30));
-                        taskCooldown.remove(31);
-                        sendMsg(admin.getChatId(), "Стрельба перезаряжена", Keyboards.adminGamePanel());
-                    });
-                }
             }
             System.out.println(user.getActiveTask());
             user.setActiveTask(0);
@@ -278,10 +251,10 @@ public class BotCore extends TelegramLongPollingBot {
             sendMsg(user.getChatId(), "Ты был избранником!" +
                     "\nПредрекали что ты уничтожишь ситхов, а не примкнёшь к ним." +
                     "\nВосстановишь равновесие силы, а не ввергнешь её во мрак!", Keyboards.rolePanel(user.getRole(), user.getAlive()));
-        }else if (sabotageStatus && Integer.parseInt(message) > 0){
+        }else if (sabotageStatus && settings.getSabotageSolvers().get(sabotage).stream().anyMatch(u -> u.equals(message))){
             checkSabotage(message, user);
         }
-        else if (user.getActiveTask() != 0 && Integer.parseInt(message) != settings.getTask(user.getActiveTask())){
+        else if (user.getActiveTask() != 0 && !message.equals(settings.getTask(user.getActiveTask()))){
             sendMsg(user.getChatId(), "Неверный код задания", Keyboards.rolePanel(user.getRole(), user.getAlive()));
         }
          else{
@@ -309,7 +282,6 @@ public class BotCore extends TelegramLongPollingBot {
                     players.getPlayerByColor(message).setAlive(false);
                     sendMsg(admin.getChatId(), "Убит " + message, Keyboards.adminGamePanel());
                     sendMsg(user.getChatId(), message + texts.getKillingTexts().get((int)(Math.random()*100)%3), Keyboards.rolePanel(false, true));
-                    //sendPht(players.getPlayerByColor(message).getChatId(),"5.png", Keyboards.rolePanel(players.getPlayerByColor(message).getRole(), false));
                     sendMsg(players.getPlayerByColor(message).getChatId(), texts.getDeadTexts().get((int)(Math.random()*100)%3), Keyboards.rolePanel(players.getPlayerByColor(message).getRole(), false));
                     user.setKillTime(time.getTime());
                     checkGameEnd();
@@ -409,8 +381,8 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     private void checkSabotage(String message, User user) {
-        if (settings.getSabotageSolvers().get(sabotage).stream().anyMatch(u -> u.toString().equals(message))){
-            settings.sabotageSolvers.get(sabotage).removeIf(u -> u.toString().equals(message));
+        if (settings.getSabotageSolvers().get(sabotage).stream().anyMatch(u -> u.equals(message))){
+            settings.sabotageSolvers.get(sabotage).removeIf(u -> u.equals(message));
             sabotageStatus = false;
             System.out.println("Саботаж починен");
             for (int i = 0; i < players.getPlayers().size(); i++) {
@@ -479,7 +451,6 @@ public class BotCore extends TelegramLongPollingBot {
             sendMsg(players.getPlayers().get(i).getChatId(), "Перезапуск игры, нажмите /start", Keyboards.startPanel());
         }
         sendMsg(admin.getChatId(), "Перезапуск", Keyboards.adminStartPanel());
-        Admin admin = new Admin();
         players = new PlayersList();
         gameStatus = "init";
         sabotage = "v";
@@ -487,16 +458,13 @@ public class BotCore extends TelegramLongPollingBot {
         someoneKilled = false;
         sabotageStatus = false;
         voteResults = new HashMap<>();
-        settings = new Settings(5, 2, 2, 3, 30, 2);
+        settings = new Settings(9, 2, 2, 1, 30, 2);
         redButton = false;
         redButtonReady = true;
         taskText = new TaskText();
         taskCooldown = new HashMap<>();
         taskUpdate = false;
         taskModify = false;
-
-        String[] subStr;
-        int voted = 0;
     }
 
     public void report(User user){
@@ -534,6 +502,7 @@ public class BotCore extends TelegramLongPollingBot {
 
     public void playersVote(String message, User user) {
         if (user != null) {
+            System.out.println();
             if (players.getPlayers().stream().anyMatch(u -> u.getColor().equals(message) && u.getAlive()) || message.equals("Пропустить")) {
                 if (voteResults.containsKey(message)) {
                     voteResults.replace(message, voteResults.get(message) + 1);
@@ -561,12 +530,12 @@ public class BotCore extends TelegramLongPollingBot {
                         if (!players.getPlayers().get(i).getColor().equals(killed.get(0))) {
                             sendMsg(players.getPlayers().get(i).getChatId(), "Вы выкинули " + killed.get(0), Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                             //Отправляем сообщение админу о том, кто был выкинут в ходе голосования
-                            sendMsg(admin.getChatId(), "Голосование завершено\nИгрок " + killed.get(0) + " был выкинут в ходе голосования", Keyboards.adminGamePanel());
                         } else {
                             sendMsg(players.getPlayers().get(i).getChatId(), "К сожалению вас выкинули." +
                                     "\nПройдите к администратору.", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                         }
                     }
+                    sendMsg(admin.getChatId(), "Голосование завершено\nИгрок " + killed.get(0) + " был выкинут в ходе голосования", Keyboards.adminGamePanel());
                 }
             } else {
                 sendMsg(admin.getChatId(), "Никто не выкинут голосованием", Keyboards.adminGamePanel());
