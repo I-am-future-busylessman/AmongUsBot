@@ -169,7 +169,7 @@ public class BotCore extends TelegramLongPollingBot {
             reboot();
         }else if(message.equals("Убить")){
             admin.setKill(null);
-            sendMsg(admin.getChatId(), "Кого хотите Убить", Keyboards.votePanel(players));
+            sendMsg(admin.getChatId(), "Кого хотите убить", Keyboards.votePanel(players));
         }else if(admin.getKill() == null){
             if (!message.equals("Пропустить")) {
                 User user = players.getPlayerByColor(message);
@@ -392,7 +392,8 @@ public class BotCore extends TelegramLongPollingBot {
         if (settings.getSabotageSolvers().get(sabotage).stream().anyMatch(u -> u.equals(message))){
             settings.sabotageSolvers.get(sabotage).removeIf(u -> u.equals(message));
             sabotageStatus = false;
-            System.out.println("Саботаж починен");
+            //Отправляем сообщение админу о том, что саботаж починен
+            sendMsg(admin.getChatId(), sabotage + " починен!" + message, Keyboards.adminGamePanel());
             for (int i = 0; i < players.getPlayers().size(); i++) {
                 sendMsg(players.getPlayers().get(i).getChatId(), sabotage + " починен!", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
             }
@@ -428,6 +429,7 @@ public class BotCore extends TelegramLongPollingBot {
 
     public void checkGameEndBySabotage() {
         if (sabotageStatus && (sabotage.equals("Реактор") || sabotage.equals("Кислород"))){
+            sendMsg(admin.getChatId(), (sabotage.equals("Реактор") ? "Реактор возрван" : "Кислород закончился"), Keyboards.adminStartPanel());
             gameEnd(false);
         }
     }
@@ -443,7 +445,7 @@ public class BotCore extends TelegramLongPollingBot {
     public void gameEnd(boolean winners){
         gameStatus = "init";
         //Отправляем сообщение админу о том, кто выиграл (оставил эту клавиатуру так как далее идет ребут)
-        sendMsg(admin.getChatId(), winners ? "Конец игры\nПобедил экипаж" : "Конец игры\nПобедили предатели", Keyboards.adminGamePanel());
+        sendMsg(admin.getChatId(), winners ? "Конец игры\nПобедил экипаж" : "Конец игры\nПобедили предатели", Keyboards.adminStartPanel());
         for (int i = 0; i < players.getPlayers().size(); i++){
             if(players.getPlayers().get(i).getRole()){
                 sendMsg(players.getPlayers().get(i).getChatId(), winners ? "Поздравляем вы победили": "В этот раз победа за предателями", Keyboards.startPanel());
