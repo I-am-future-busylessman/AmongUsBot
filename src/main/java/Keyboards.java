@@ -179,8 +179,11 @@ public class Keyboards {
                                 .orElse(null)).getColor()));
             }
         }
+        KeyboardRow keyboardThirdRow = new KeyboardRow();
+        keyboardThirdRow.add(new KeyboardButton("Отмена"));
         keyboard.add(keyboardFirstRow);
         keyboard.add(keyboardSecondRow);
+        keyboard.add(keyboardThirdRow);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
