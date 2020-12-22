@@ -171,28 +171,36 @@ public class BotCore extends TelegramLongPollingBot {
             admin.setKill(null);
             sendMsg(admin.getChatId(), "Кого хотите Убить", Keyboards.votePanel(players));
         }else if(admin.getKill() == null){
-            User user = players.getPlayerByColor(message);
-            System.out.println(user);
-            if (user.getAlive()) {
-                user.setAlive(false);
-                sendMsg(user.getChatId(), "Вас убил администратор, подойдите к нему", Keyboards.rolePanel(user.getRole(), user.getAlive()));
-                sendMsg(admin.getChatId(), "Успешно", Keyboards.adminGamePanel());
-            }else{
-                sendMsg(admin.getChatId(), "Он и так мёртв", Keyboards.adminGamePanel());
+            if (!message.equals("Пропустить")) {
+                User user = players.getPlayerByColor(message);
+                System.out.println(user);
+                if (user.getAlive()) {
+                    user.setAlive(false);
+                    sendMsg(user.getChatId(), "Вас убил администратор, подойдите к нему", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+                    sendMsg(admin.getChatId(), "Успешно", Keyboards.adminGamePanel());
+                } else {
+                    sendMsg(admin.getChatId(), "Он и так мёртв", Keyboards.adminGamePanel());
+                }
             }
-            admin.setMakeAlive("Admin");
+            else
+                sendMsg(admin.getChatId(), "Ок, пропускаю", Keyboards.adminGamePanel());
+            admin.setKill("Admin");
         }else if(message.equals("Воскресить")){
             admin.setMakeAlive(null);
             sendMsg(admin.getChatId(), "Кого хотите воскресить", Keyboards.makeAlive(players));
         }else if(admin.getMakeAlive() == null){
-            User user = players.getPlayerByColor(message);
-            if (!user.getAlive()) {
-                user.setAlive(true);
-                sendMsg(user.getChatId(), "Вас воскресили", Keyboards.rolePanel(user.getRole(), user.getAlive()));
-                sendMsg(admin.getChatId(), "Успешно", Keyboards.adminGamePanel());
-            }else{
-                sendMsg(admin.getChatId(), "Он и так жив", Keyboards.adminGamePanel());
+            if (!message.equals("Пропустить")) {
+                User user = players.getPlayerByColor(message);
+                if (!user.getAlive()) {
+                    user.setAlive(true);
+                    sendMsg(user.getChatId(), "Вас воскресили, продолжайте игру", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+                    sendMsg(admin.getChatId(), "Успешно", Keyboards.adminGamePanel());
+                } else {
+                    sendMsg(admin.getChatId(), "Он и так жив", Keyboards.adminGamePanel());
+                }
             }
+            else
+                sendMsg(admin.getChatId(), "Ок, пропускаю", Keyboards.adminGamePanel());
             admin.setMakeAlive("Admin");
         }else if(message.equals("Обновить задание")){
             if (taskCooldown.size() > 0) {
