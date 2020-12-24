@@ -137,7 +137,7 @@ public class BotCore extends TelegramLongPollingBot {
             user.setColor(message);
             user.setAlive(true);
             user.setVoted(false);
-            System.out.println("Добален " + user.getColor() + " игрок");
+            sendMsg(admin.getChatId(), "Добален " + user.getColor() + " игрок", Keyboards.adminStartPanel());
             sendMsg(user.getChatId(), texts.getHelloTexts().get((int) (Math.random() * 100) % 3) + user.getColor(), null);
             if (players.getPlayers().stream().filter(u -> u.getColor() != null).count() == settings.getPlayers()) {
                 sendMsg(admin.getChatId(), "Команда укомплектована, можно начинать", Keyboards.adminStartPanel());
@@ -395,7 +395,7 @@ public class BotCore extends TelegramLongPollingBot {
             settings.sabotageSolvers.get(sabotage).removeIf(u -> u.equals(message));
             sabotageStatus = false;
             //Отправляем сообщение админу о том, что саботаж починен
-            sendMsg(admin.getChatId(), sabotage + " починен!" + message, Keyboards.adminGamePanel());
+            sendMsg(admin.getChatId(), sabotage + " починен!", Keyboards.adminGamePanel());
             for (int i = 0; i < players.getPlayers().size(); i++) {
                 sendMsg(players.getPlayers().get(i).getChatId(), sabotage + " починен!", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
             }
@@ -496,7 +496,7 @@ public class BotCore extends TelegramLongPollingBot {
                         }
                     } else {
                         sendMsg(players.getPlayers().get(i).getChatId(), "Собрание! \n Но вы мертвы и не голосуете." +
-                                "\nПройдите к администратору.", Keyboards.votePanel(players));
+                                "\nПройдите к администратору.", Keyboards.empty());
                     }
                 }
                 sendMsg(admin.getChatId(), "Начинается собрание!", Keyboards.adminVotePanel());

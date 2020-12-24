@@ -240,4 +240,8 @@ public class Keyboards {
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
+
+    public static ReplyKeyboardMarkup empty(){
+        return new ReplyKeyboardMarkup();
+    }
 }
