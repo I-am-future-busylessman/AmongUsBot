@@ -118,7 +118,9 @@ public class BotCore extends TelegramLongPollingBot {
             players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> sendMsg(u.getChatId(),
                     "Ты предатель, тебе доступны такие действия как Убийство и Саботаж." +
                     "\nУничтожь их всех или сломай корабль." +
-                    "\nНе попадись!" + (imposterCount > 1 ? "\nСписок предателей: " + String.join(" ", names) : "") , Keyboards.rolePanel(false, true)));
+                    "\nНе попадись!" + (imposterCount > 1 ? "\nСписок предателей: " + String.join(" ", names) : "") +
+                    "\nВот список заданий чтобы ты мог обманывать:\n" +
+                    taskText.getImposterTasks(), Keyboards.rolePanel(false, true)));
             //Отправляем сообщения администратору о том, кто предатели в игре
             if (imposterCount > 1)
                 sendMsg(admin.getChatId(), "Предатели: " + String.join(" ", names), Keyboards.adminGamePanel());
@@ -468,7 +470,7 @@ public class BotCore extends TelegramLongPollingBot {
         someoneKilled = false;
         sabotageStatus = false;
         voteResults = new HashMap<>();
-        settings = new Settings(9, 2, 2, 1, 30, 2);
+        settings = new Settings(settings.getPlayers(), settings.getEasyTasks(), settings.getNormalTasks(), settings.getTimerTasks(), settings.getImposterKD(), settings.getImpostersCount());
         redButton = false;
         redButtonReady = true;
         taskText = new TaskText();
@@ -559,6 +561,11 @@ public class BotCore extends TelegramLongPollingBot {
             }
             voted = 0;
             voteResults = new HashMap<>();
+            Date time = new Date();
+            players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> {
+                u.setKillTime(time.getTime());
+                u.setSabotageTime(time.getTime());
+            });
             checkGameEnd();
             //кнопка не может использоваться в течение минуты
             redButtonReady = false;

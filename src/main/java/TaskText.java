@@ -1,16 +1,21 @@
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public class TaskText {
     Map<Integer, String> task = new HashMap<>();
     Map<String, String> sabotage = new HashMap<>();
+    String imposterTasks = "";
 
     public TaskText() {
         makeTasks();
         makeSabotage();
+        List<Integer> keysList = new ArrayList<>(task.keySet());
+        for (int i = 0; i  < 3; i++) {
+            int randomIndex = new Random().nextInt(keysList.size());
+            imposterTasks += keysList.get(randomIndex) + " " + task.get(keysList.get(randomIndex)) + "\n";
+        }
     }
 
 
