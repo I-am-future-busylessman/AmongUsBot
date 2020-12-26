@@ -26,6 +26,7 @@ public class Keyboards {
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         keyboardFirstRow.add(new KeyboardButton("Запуск"));
+        keyboardFirstRow.add(new KeyboardButton("Ручной запуск"));
         KeyboardRow keyboardSecondRow = new KeyboardRow();
         keyboardSecondRow.add(new KeyboardButton("Настройки"));
         KeyboardRow keyboardThirdRow = new KeyboardRow();

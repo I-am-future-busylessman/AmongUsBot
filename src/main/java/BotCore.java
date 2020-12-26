@@ -68,9 +68,9 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     public void adminBeforeStart(String message){
-        if (message.compareTo("/start") == 0) {
+        if (message.equals("/start")) {
             sendMsg(admin.getChatId(), "Здравствуй, администратор", Keyboards.adminStartPanel());
-        }else if (message.compareTo("Настройки") == 0){
+        }else if (message.equals("Настройки")){
             sendMsg(admin.getChatId(), "Введите следующие настройки через пробел: \n" +
                     "/set количество игроков " +
                     "количество простых заданий " +
@@ -87,9 +87,9 @@ public class BotCore extends TelegramLongPollingBot {
             settings.setImposterKD(Integer.valueOf(subStr[5]));
             settings.setImpostersCount(Integer.valueOf(subStr[6]));
             sendMsg(admin.getChatId(), "Настройки сохранены", null);
-        }else if (message.compareTo("Покажи настройки") == 0){
+        }else if (message.equals("Покажи настройки")){
             sendMsg(admin.getChatId(), settings.getAllSettings(), null);
-        }else if (message.compareTo("Запуск") == 0) {
+        }else if (message.equals("Запуск")) {
             gameStatus = "game";
             int impostersCount = 0;
             sendMsg(admin.getChatId(), "Запускаем игру...", Keyboards.adminGamePanel());
