@@ -130,6 +130,7 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     public void userBeforeStart(Update update, String message, User user){
+        System.out.println(message);
         if(message.equals("/start") && players.getUser(update.getMessage().getChatId()) == null){
             players.addPlayer(new User(update.getMessage().getChatId()));
             sendMsg(update.getMessage().getChatId(), "Здравствуй, игрок, Какой у тебя цвет?", null);
@@ -573,7 +574,7 @@ public class BotCore extends TelegramLongPollingBot {
             Executors.newCachedThreadPool().submit(() -> {
                 try {
                     //поток ждет минуту
-                    Thread.sleep(60000);
+                    Thread.sleep(90000);
                     //делаем кнопку работоспособной
                     redButtonReady = true;
                     //Сообщение админу о начале работы кнопки

@@ -37,14 +37,14 @@ public class Texts {
         List<String> sendingTaskTexts = new ArrayList<>();
         sendingTaskTexts.add("Срочно! задание номер ");
         sendingTaskTexts.add("Тебе надо выполнить задание номер ");
-        sendingTaskTexts.add("Мне нужно чтобы ты сделала задание номер ");
+        sendingTaskTexts.add("Мне нужно чтобы ты сделал задание номер ");
         this.sendingTaskTexts = sendingTaskTexts;
     }
 
     public void makeKillingTexts() {
         List<String> killingTexts = new ArrayList<>();
         killingTexts.add(" убит, валим!");
-        killingTexts.add(" был словным членом экипажа, но ты его убил.");
+        killingTexts.add(" был славным членом экипажа, но ты его убил.");
         killingTexts.add(" убит точным выстрелом!");
         this.killingTexts = killingTexts;
     }

@@ -76,22 +76,21 @@ public class Settings {
 
     public void makeEasyTasks(){
         Map<Integer,String> easyTasksMap = new HashMap<>();
-        easyTasksMap.put(0, "59");
+        easyTasksMap.put(0, "2980");
+        easyTasksMap.put(1, "10");
         easyTasksMap.put(2, "6941");
         easyTasksMap.put(3, "4571");
         easyTasksMap.put(4, "9783");
-        easyTasksMap.put(5, "28");
+        easyTasksMap.put(5, "20");
         easyTasksMap.put(6, "3");
         this.easyTasksMap = easyTasksMap;
     }
 
     public void makeNormalTasks(){
         Map<Integer,String> normalTasksMap = new HashMap<>();
-        normalTasksMap.put(0, "9475");
         normalTasksMap.put(1, "3915");
         normalTasksMap.put(2, "32");
         normalTasksMap.put(3, "9039");
-        normalTasksMap.put(4, "8130");
         normalTasksMap.put(5, "2147");
         normalTasksMap.put(6, "9120");
         normalTasksMap.put(7, "27");
@@ -104,9 +103,8 @@ public class Settings {
         hardTasksMap.put(2, "7361");
         hardTasksMap.put(3, "4");
         hardTasksMap.put(4, "4");
-        hardTasksMap.put(5, "1070");
-        //hardTasksMap.put(7, new Date().getHours()*100 + new Date().getMinutes());
-        hardTasksMap.put(8, "8");
+        hardTasksMap.put(5, "140");
+        //hardTasksMap.put(8, "8");
         this.timerTasksMap = hardTasksMap;
     }
 
