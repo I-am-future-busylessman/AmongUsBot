@@ -1,0 +1,14 @@
+public synchronized void sendPht(Long chatId, String path, ReplyKeyboardMarkup keyboard) {
+        SendPhoto sendPhoto = new SendPhoto();
+
+        sendPhoto.setChatId(chatId);
+        sendPhoto.setNewPhoto(new File("/Users/out-kolyada-ad/IdeaProjects/AmongUS/src/main/resources", path));
+        if (keyboard != null){
+            sendPhoto.setReplyMarkup(keyboard);
+        }
+        try {
+            sendPhoto(sendPhoto);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }

@@ -25,6 +25,8 @@ public class BotCore extends TelegramLongPollingBot {
     Texts texts = new Texts();
     boolean someoneKilled = false;
     boolean sabotageStatus = false;
+    boolean sabotageBeforeVote = false;
+    User starter = null;
     HashMap<String, Integer> voteResults = new HashMap<>();
     private Settings settings = new Settings(9, 2, 2, 1, 30, 2);
     boolean redButton = false;
@@ -314,72 +316,8 @@ public class BotCore extends TelegramLongPollingBot {
             report(user);
         }else if(sabotage.equals("Саботаж")) {
             if (settings.getSabotageSolvers().containsKey(message)) {
-                user.setSabotageTime(time.getTime());
-                sabotage = message;
-                sabotageStatus = true;
-                if (message.equals("Реактор")) {
-                    Executors.newCachedThreadPool().submit(() -> {
-                        try {
-                            Thread.sleep(30000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (sabotageStatus)
-                            sendToAlive("До взрыва реактора осталась 1 минута");
-                        try {
-                            Thread.sleep(30000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (sabotageStatus)
-                            sendToAlive("До взрыва реактора осталось 30 секунд");
-                        try {
-                            Thread.sleep(20000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (sabotageStatus)
-                            sendToAlive("До взрыва реактора осталось 10 секунд");
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        checkGameEndBySabotage();
-                    });
-                }else if(message.equals("Кислород")){
-                    Executors.newCachedThreadPool().submit(() -> {
-                        try {
-                            Thread.sleep(30000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (sabotageStatus)
-                                sendToAlive("До полной утечки кислорода осталась 1 минута");
-                        try {
-                            Thread.sleep(30000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (sabotageStatus)
-                                sendToAlive("До полной утечки кислорода осталось 30 секунд");
-                        try {
-                            Thread.sleep(20000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (sabotageStatus)
-                                sendToAlive("До полной утечки кислорода осталось 10 секунд");
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        checkGameEndBySabotage();
-                    });
-                }
-                sendMsg(admin.getChatId(), "Сломай " + message, Keyboards.adminGamePanel());
-                sendSabotage(message);
+                starter = user;
+                startSabotage(message, user);
             }else{
                 sabotage = message;
                 sendMsg(user.getChatId(), "Это сделано в СССР, не ломается", Keyboards.rolePanel(user.getRole(), user.getAlive()));
@@ -389,6 +327,80 @@ public class BotCore extends TelegramLongPollingBot {
         }else{
             sendMsg(user.getChatId(), "Неизвестная команда" ,Keyboards.rolePanel(false, user.getAlive()));
         }
+    }
+
+    private void startSabotage(String message, User user) {
+        Date time = new Date();
+        user.setSabotageTime(time.getTime());
+        sabotageBeforeVote = false;
+        sabotage = message;
+        sabotageStatus = true;
+        if (message.equals("Реактор")) {
+            Executors.newCachedThreadPool().submit(() -> {
+                try {
+                    Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (sabotageStatus)
+                    sendToAlive("До взрыва реактора осталась 1 минута");
+                try {
+                    Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (sabotageStatus)
+                    sendToAlive("До взрыва реактора осталось 30 секунд");
+                try {
+                    Thread.sleep(20000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (sabotageStatus)
+                    sendToAlive("До взрыва реактора осталось 10 секунд");
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                checkGameEndBySabotage();
+            });
+        }else if(message.equals("Кислород")){
+            Executors.newCachedThreadPool().submit(() -> {
+                try {
+                    Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (sabotageStatus)
+                    sendToAlive("До полной утечки кислорода осталась 1 минута");
+                try {
+                    Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (sabotageStatus)
+                    sendToAlive("До полной утечки кислорода осталось 30 секунд");
+                try {
+                    Thread.sleep(20000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (sabotageStatus)
+                    sendToAlive("До полной утечки кислорода осталось 10 секунд");
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                checkGameEndBySabotage();
+            });
+        }
+        if (!sabotageBeforeVote)
+            sendMsg(admin.getChatId(), "Сломай " + message, Keyboards.adminGamePanel());
+        else
+            sendMsg(admin.getChatId(), "Саботаж " + message + " продолжается", Keyboards.adminGamePanel());
+        sendSabotage(message);
     }
 
     private void checkSabotage(String message, User user) {
@@ -484,15 +496,16 @@ public class BotCore extends TelegramLongPollingBot {
         //проверяем, работает ли кнопка или кого-то убили
         if (redButtonReady || someoneKilled) {
             if (someoneKilled || redButton) {
-                sabotageStatus = false;
+                if (sabotageStatus){
+                    sabotageBeforeVote = true;
+                    sabotageStatus = false;
+                }
                 gameStatus = "vote";
                 for (int i = 0; i < players.getPlayers().size(); i++) {
                     if (players.getPlayers().get(i).getAlive()) {
                         if (someoneKilled) {
-                            //sendPht(players.getPlayers().get(i).getChatId(), "6.png", Keyboards.votePanel(players));
                             sendMsg(players.getPlayers().get(i).getChatId(), texts.getReportTexts().get((int) (Math.random() * 100) % 3), Keyboards.votePanel(players));
                         } else {
-                            //sendPht(players.getPlayers().get(i).getChatId(), "7.png", Keyboards.votePanel(players));
                             sendMsg(players.getPlayers().get(i).getChatId(), texts.getReportTexts().get((int) (Math.random() * 100) % 2), Keyboards.votePanel(players));
                         }
                     } else {
@@ -589,6 +602,8 @@ public class BotCore extends TelegramLongPollingBot {
                 }
             });
             //Конец потока кнопки
+            if (sabotageBeforeVote)
+                startSabotage(sabotage, players.getUser(starter.getChatId()));
         }
     }
 
@@ -610,21 +625,6 @@ public class BotCore extends TelegramLongPollingBot {
         }
         try {
             sendMessage(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public synchronized void sendPht(Long chatId, String path, ReplyKeyboardMarkup keyboard) {
-        SendPhoto sendPhoto = new SendPhoto();
-
-        sendPhoto.setChatId(chatId);
-        sendPhoto.setNewPhoto(new File("/Users/out-kolyada-ad/IdeaProjects/AmongUS/src/main/resources", path));
-        if (keyboard != null){
-            sendPhoto.setReplyMarkup(keyboard);
-        }
-        try {
-            sendPhoto(sendPhoto);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
