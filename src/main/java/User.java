@@ -23,9 +23,15 @@ public class User {
     int hardTasks;
     int totalTasks;
     private List<Integer> complitedTasks = new ArrayList<>();
+    private List<Integer> oldTasks = new ArrayList<>();
 
     public User(Long chatID) {
         this.chatId = chatID;
+    }
+
+    public User(User user){
+        chatId = user.getChatId();
+        oldTasks = user.getComplitedTasks();
     }
 
     public Long getChatId(){
@@ -42,7 +48,7 @@ public class User {
             int finalTaskNumber = taskNumber;
             while (true){
                 int finalNumber = (int)(Math.random()*10);
-                if (complitedTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber)){
+                if (complitedTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber) && oldTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber)){
                     taskNumber += finalNumber;
                     break;
                 }
@@ -52,7 +58,7 @@ public class User {
             int finalTaskNumber = taskNumber;
             while (true){
                 int finalNumber = (int)(Math.random()*10);
-                if (complitedTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber)){
+                if (complitedTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber) && oldTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber)){
                     taskNumber += finalNumber;
                     break;
                 }
@@ -62,7 +68,7 @@ public class User {
             int finalTaskNumber = taskNumber;
             while (true){
                 int finalNumber = (int)(Math.random()*10);
-                if (complitedTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber)){
+                if (complitedTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber) && oldTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber)){
                     taskNumber += finalNumber;
                     break;
                 }

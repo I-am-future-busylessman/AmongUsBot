@@ -20,6 +20,7 @@ public class BotCore extends TelegramLongPollingBot {
     private final String botName = "Space_mafia_bot";
     private Admin admin = new Admin();
     PlayersList players = new PlayersList();
+    Date gameTime;
     String gameStatus = "init";
     String sabotage = "v";
     Texts texts = new Texts();
@@ -92,6 +93,7 @@ public class BotCore extends TelegramLongPollingBot {
         }else if (message.compareTo("Покажи настройки") == 0){
             sendMsg(admin.getChatId(), settings.getAllSettings(), null);
         }else if (message.compareTo("Запуск") == 0) {
+            gameTime = new Date();
             gameStatus = "game";
             int impostersCount = 0;
             sendMsg(admin.getChatId(), "Запускаем игру...", Keyboards.adminGamePanel());
@@ -136,7 +138,7 @@ public class BotCore extends TelegramLongPollingBot {
         if(message.equals("/start") && players.getUser(update.getMessage().getChatId()) == null){
             players.addPlayer(new User(update.getMessage().getChatId()));
             sendMsg(update.getMessage().getChatId(), "Здравствуй, игрок, Какой у тебя цвет?", null);
-        }else if(user.getChatId() != -1 && user.getColor() == null && gameStatus.equals("init")){
+        }else if(user.getChatId() != -1 && user.getColor() == null /* && gameStatus.equals("init")*/){
             user.setColor(message);
             user.setAlive(true);
             user.setVoted(false);
@@ -468,6 +470,7 @@ public class BotCore extends TelegramLongPollingBot {
                 sendMsg(players.getPlayers().get(i).getChatId(), winners ? "В этот раз победа за экипажем": "Корабль захвачен!", Keyboards.startPanel());
             }
         }
+        sendMsg(394615109L, Long.toString(new Date().getTime() - gameTime.getTime()/60000) ,Keyboards.empty());
         reboot();
     }
 
@@ -476,7 +479,7 @@ public class BotCore extends TelegramLongPollingBot {
             sendMsg(players.getPlayers().get(i).getChatId(), "Перезапуск игры, нажмите /start", Keyboards.startPanel());
         }
         sendMsg(admin.getChatId(), "Перезапуск", Keyboards.adminStartPanel());
-        players = new PlayersList();
+        players.reboot();
         gameStatus = "init";
         sabotage = "v";
         texts = new Texts();

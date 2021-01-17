@@ -7,6 +7,13 @@ import java.util.ArrayList;
 public class PlayersList{
     private ArrayList<User> players = new ArrayList<>();
 
+    public void reboot () {
+        for (User player:players) {
+            player = new User(player);
+        }
+        System.out.println(players.toString());
+    }
+
     public long countAlive(){
         int counter = 0;
         for (User player : players) {
