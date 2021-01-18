@@ -14,14 +14,14 @@ public class Settings {
     private Integer timerTasks;
     private Integer imposterKD;
     private Integer impostersCount;
-    private Map<Integer,String> easyTasksMap = new HashMap<>();
-    private Map<Integer,String> normalTasksMap = new HashMap<>();
-    private Map<Integer,String> timerTasksMap = new HashMap<>();
+    private Map<Integer, TaskVersions> allTasks = new HashMap<>();
+    private Map<Integer,TaskVersions> easyTasksMap = new HashMap<>();
+    private Map<Integer,TaskVersions> normalTasksMap = new HashMap<>();
+    private Map<Integer,TaskVersions> hardTasksMap = new HashMap<>();
     private ArrayList<String> lightSolvers = new ArrayList<>();
     private ArrayList<String> reactorSolvers = new ArrayList<>();
     private ArrayList<String> oxygenSolvers = new ArrayList<>();
     private ArrayList<String> networkSolvers = new ArrayList<>();
-    private Map<Integer, String> availableTasks = new HashMap<>();
     public Map<String, ArrayList<String>> sabotageSolvers = new HashMap<>();
 
     public Settings(Integer players, Integer easyTasks, Integer normalTasks, Integer timerTasks, Integer imposterKD, Integer impostersCount) {
@@ -37,13 +37,13 @@ public class Settings {
         makeHardTasks();
     }
 
-    public String getTask(int task){
+    public Task getTask(int task){
         if (task / 10 == 3){
-            return timerTasksMap.get(task % 10);
+            return hardTasksMap.get(task % 10).getTask();
         }else if (task / 10 == 2){
-            return normalTasksMap.get(task % 10);
+            return normalTasksMap.get(task % 10).getTask();
         }else{
-            return easyTasksMap.get(task % 10);
+            return easyTasksMap.get(task % 10).getTask();
         }
     }
 
@@ -75,37 +75,31 @@ public class Settings {
     }
 
     public void makeEasyTasks(){
-        Map<Integer,String> easyTasksMap = new HashMap<>();
-        easyTasksMap.put(0, "2980");
-        easyTasksMap.put(1, "10");
-        easyTasksMap.put(2, "6941");
-        easyTasksMap.put(3, "4571");
-        easyTasksMap.put(4, "9783");
-        easyTasksMap.put(5, "20");
-        easyTasksMap.put(6, "3");
+        Map<Integer,TaskVersions> easyTasksMap = new HashMap<>();
+        TaskVersions task0 = new TaskVersions();
+        task0.putTaskVersion(0, new Task("Что-то не так с порядком букв...", "2980"));
+        task0.putTaskVersion(1, new Task("Что-то не так с порядком букв...", "3031"));
+        task0.putTaskVersion(2, new Task("Что-то не так с порядком букв...", "1000"));
+        easyTasksMap.put(0, task0);
         this.easyTasksMap = easyTasksMap;
     }
 
     public void makeNormalTasks(){
-        Map<Integer,String> normalTasksMap = new HashMap<>();
-        normalTasksMap.put(1, "3915");
-        normalTasksMap.put(2, "32");
-        normalTasksMap.put(3, "9039");
-        normalTasksMap.put(5, "2147");
-        normalTasksMap.put(6, "9120");
-        normalTasksMap.put(7, "27");
-        normalTasksMap.put(8, "8160");
+        Map<Integer,TaskVersions> normalTasksMap = new HashMap<>();
+        TaskVersions task0 = new TaskVersions();
+        task0.putTaskVersion(0, new Task("Собери квадрат, затем верни все в исходное положение", "2980"));
+        task0.putTaskVersion(1, new Task("Собери квадрат, затем верни все в исходное положение", "3031"));
+        task0.putTaskVersion(2, new Task("Собери квадрат, затем верни все в исходное положение", "1000"));
         this.normalTasksMap = normalTasksMap;
     }
 
     public void makeHardTasks(){
-        Map<Integer,String> hardTasksMap = new HashMap<>();
-        hardTasksMap.put(2, "7361");
-        hardTasksMap.put(3, "4");
-        hardTasksMap.put(4, "4");
-        hardTasksMap.put(5, "140");
-        //hardTasksMap.put(8, "8");
-        this.timerTasksMap = hardTasksMap;
+        Map<Integer,TaskVersions> hardTasksMap = new HashMap<>();
+        TaskVersions task0 = new TaskVersions();
+        task0.putTaskVersion(0, new Task("Собери квадрат, затем верни все в исходное положение", "2980"));
+        task0.putTaskVersion(1, new Task("Собери квадрат, затем верни все в исходное положение", "3031"));
+        task0.putTaskVersion(2, new Task("Собери квадрат, затем верни все в исходное положение", "1000"));
+        this.hardTasksMap = hardTasksMap;
     }
 
     public String getAllSettings(){
@@ -119,21 +113,12 @@ public class Settings {
         return str;
     }
 
-    public void removeTask(Integer key){
-        timerTasksMap.remove(key);
-    }
-
-    public void addTask(Integer key, String value){
-        timerTasksMap.put(key, value);
-
-    }
-
     public boolean checkAvailableTasks(Integer number){
         if (number/10 == 1)
             return easyTasksMap.containsKey(number%10);
         else if (number/10 == 2)
             return normalTasksMap.containsKey(number%10);
         else
-            return timerTasksMap.containsKey(number%10);
+            return hardTasksMap.containsKey(number%10);
     }
 }

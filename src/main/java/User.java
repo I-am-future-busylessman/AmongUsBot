@@ -8,7 +8,8 @@ import java.util.List;
 @Setter
 
 public class User {
-    private int activeTask = 0;
+    private int activeTaskNum = 0;
+    private Task activeTask;
     private Boolean role;
     private Long chatId;
     private String color = null;
@@ -78,7 +79,7 @@ public class User {
             getTask();
         }
         else {
-            activeTask = taskNumber;
+            activeTaskNum = taskNumber;
         }
     }
     public String getColor(User user) {

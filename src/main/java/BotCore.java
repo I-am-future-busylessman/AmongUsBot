@@ -1,14 +1,13 @@
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -122,9 +121,8 @@ public class BotCore extends TelegramLongPollingBot {
             players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> sendMsg(u.getChatId(),
                     "Ты предатель, тебе доступны такие действия как Убийство и Саботаж." +
                     "\nУничтожь их всех или сломай корабль." +
-                    "\nНе попадись!" + (imposterCount > 1 ? "\nСписок предателей: " + String.join(" ", names) : "") +
-                    "\nВот список заданий чтобы ты мог обманывать:\n" +
-                    taskText.getImposterTasks(), Keyboards.rolePanel(false, true)));
+                    "\nНе попадись!" + (imposterCount > 1 ? "\nСписок предателей: " + String.join(" ", names) : ""),
+                    Keyboards.rolePanel(false, true)));
             //Отправляем сообщения администратору о том, кто предатели в игре
             if (imposterCount > 1)
                 sendMsg(admin.getChatId(), "Предатели: " + String.join(" ", names), Keyboards.adminGamePanel());
@@ -153,18 +151,7 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     public void adminInGame(String message){
-        if (taskUpdate){
-            if (taskCooldown.containsKey(Integer.getInteger(message.split(" ")[0]))){
-                settings.addTask(Integer.getInteger(message.split(" ")[0]), message.split(" ")[1]);
-                taskCooldown.remove(Integer.getInteger(message.split(" ")[0]));
-                sendMsg(admin.getChatId(), "Задание успешно обновлено", Keyboards.adminGamePanel());
-                taskUpdate = false;
-            }
-            else {
-                taskUpdate = false;
-                sendMsg(admin.getChatId(), "Это задание уже обновлено", Keyboards.adminGamePanel());
-            }
-        }else if (message.equals("Голосование")){
+        if (message.equals("Голосование")){
             //проверяем, работает ли кнопка
             if (redButtonReady) {
                 redButton = true;
@@ -209,57 +196,51 @@ public class BotCore extends TelegramLongPollingBot {
             else
                 sendMsg(admin.getChatId(), "Ок, пропускаю", Keyboards.adminGamePanel());
             admin.setMakeAlive("Admin");
-        }else if(message.equals("Обновить задание")){
-            if (taskCooldown.size() > 0) {
-                sendMsg(admin.getChatId(), "Какое задание вы хотите обновить?", Keyboards.taskUpdate(taskCooldown.keySet()));
-                taskUpdate = true;
-            }
-            else
-                sendMsg(admin.getChatId(), "Все задания активны", Keyboards.adminGamePanel());
         }else{
             sendMsg(admin.getChatId(), "Неизвестная команда", Keyboards.adminGamePanel());
         }
     }
 
     public void crewMemberInGame(String message, User user){
-        if(message.equals("Получить задание") && user.getActiveTask() == 0){
+        if(message.equals("Получить задание") && user.getActiveTaskNum() == 0){
             user.getTask();
             sendMsg(user.getChatId(), texts.getGettingTaskTexts().get((int)(Math.random()*100)%3), Keyboards.rolePanel(true, user.getAlive()));
-            while (user.getActiveTask() != 0) {
-                int finalTask = user.getActiveTask();
+            while (user.getActiveTaskNum() != 0) {
+                int finalTask = user.getActiveTaskNum();
 
-                if (players.getPlayers().stream().noneMatch(u -> u.getActiveTask() == finalTask
+                if (players.getPlayers().stream().noneMatch(u -> u.getActiveTaskNum() == finalTask
                         && !u.getChatId().equals(user.getChatId()))
                         && settings.checkAvailableTasks(finalTask)){
                     break;
                 }
                 user.getTask();
             }
-            if (user.getActiveTask() == 0){
+            if (user.getActiveTaskNum() == 0){
                 sendMsg(user.getChatId(), "Ты уже всё сделал", Keyboards.rolePanel(true, user.getAlive()));
 
                 // отправляем сообщение админу о том, что пользователь сделал все задания
                 sendMsg(admin.getChatId(), "Игрок " + user.getColor() + " выполнил все задания!", Keyboards.adminGamePanel());
 
             }else {
+                user.setActiveTask(settings.getTask(user.getActiveTaskNum()));
                 sendMsg(user.getChatId(),
-                        texts.getSendingTaskTexts().get((int)(Math.random()*100)%3) + user.getActiveTask() +"\n" + taskText.getTask().get(user.getActiveTask()),
+                        texts.getSendingTaskTexts().get((int)(Math.random()*100)%3) + user.getActiveTask() +"\n" + user.getActiveTask().getTaskText(),
                         Keyboards.rolePanel(user.getRole(), user.getAlive()));
             }
         }else if (message.equals("Репорт") && user.getAlive()){
             report(user);
-        }else if (user.getActiveTask() != 0 &&
-                (message.equals(settings.getTask(user.getActiveTask())))){
-            user.getComplitedTasks().add(user.getActiveTask());
-            if(user.getActiveTask()/10 == 1)
+        }else if (user.getActiveTaskNum() != 0 &&
+                (message.equals(settings.getTask(user.getActiveTaskNum()).getCode()))){
+            user.getComplitedTasks().add(user.getActiveTaskNum());
+            if(user.getActiveTaskNum()/10 == 1)
                 user.setEasyTasks(user.getEasyTasks() - 1);
-            else if(user.getActiveTask()/10 == 2)
+            else if(user.getActiveTaskNum()/10 == 2)
                 user.setNormalTasks(user.getNormalTasks() - 1);
             else {
                 user.setHardTasks(user.getHardTasks() - 1);
             }
             System.out.println(user.getActiveTask());
-            user.setActiveTask(0);
+            user.setActiveTaskNum(0);
             sendMsg(user.getChatId(), texts.getCompletingTaskTexts().get((int)(Math.random()*100)%3), Keyboards.rolePanel(user.getRole(), user.getAlive()));
             checkGameEndByTasks();
         }else if (message.equals("Убить")){
@@ -269,7 +250,7 @@ public class BotCore extends TelegramLongPollingBot {
         }else if (sabotageStatus && settings.getSabotageSolvers().get(sabotage).stream().anyMatch(u -> u.equals(message))){
             checkSabotage(message, user);
         }
-        else if (user.getActiveTask() != 0 && !message.equals(settings.getTask(user.getActiveTask()))){
+        else if (user.getActiveTaskNum() != 0 && !message.equals(user.getActiveTask().getCode())){
             sendMsg(user.getChatId(), "Неверный код задания", Keyboards.rolePanel(user.getRole(), user.getAlive()));
         }
          else{
@@ -326,6 +307,9 @@ public class BotCore extends TelegramLongPollingBot {
             }
         }else if (sabotageStatus && Integer.parseInt(message) > 0) {
             checkSabotage(message, user);
+        }else if(message.equals("Получить задание") && user.getAlive()) {
+            user.getTask();
+            sendMsg(user.getChatId(), settings.getTask(user.getActiveTaskNum()).getTaskText(), Keyboards.imposterPanel(user.getAlive()));
         }else{
             sendMsg(user.getChatId(), "Неизвестная команда" ,Keyboards.rolePanel(false, user.getAlive()));
         }
