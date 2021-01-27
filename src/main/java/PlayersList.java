@@ -8,10 +8,13 @@ public class PlayersList{
     private ArrayList<User> players = new ArrayList<>();
 
     public void reboot () {
+        ArrayList<User> newPlayers = new ArrayList<>();
         for (User player:players) {
             player = new User(player);
+            newPlayers.add(player);
         }
-        System.out.println(players.toString());
+        players = newPlayers;
+        System.out.println(newPlayers.toString());
     }
 
     public long countAlive(){
