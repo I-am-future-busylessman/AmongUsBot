@@ -96,7 +96,7 @@ public class Settings {
         task.putTaskVersion(0, new Task("Рассортирую папки с данными в алфавитном порядке.", "Добавить"));
         task.putTaskVersion(1, new Task("Рассортируй папки c данными по первой букве их цвета.", "Добавить"));
         task.putTaskVersion(2, new Task("Расставь папки по порядку: Синий, Красный, Фиолетовый, Зелёный", "Добавить"));
-        task.putTaskVersion(3, new Task("Расставь папки по количеству листов в них.", "Добавить"));
+        //task.putTaskVersion(3, new Task("Расставь папки по количеству листов в них.", "Добавить"));
         easyTasksMap.put(0, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Проверь работу защитных щитов. Активируй, а затем дезактивируй их.", "Добавить"));
@@ -115,16 +115,16 @@ public class Settings {
         task.putTaskVersion(1, new Task("Кто дойдёт до лаборатории.", "Добавить"));
         task.putTaskVersion(2, new Task("Кто дойдёт до столовой.", "Добавить"));
         easyTasksMap.put(3, task);
+        //task = new TaskVersions();
+        //task.putTaskVersion(0, new Task("Подбери ключ от замка под номером 1", "Добавить"));
+        //task.putTaskVersion(1, new Task("Подбери ключ от замка под номером 2", "Добавить"));
+        //task.putTaskVersion(2, new Task("Подбери ключ от замка под номером 3", "Добавить"));
+        //easyTasksMap.put(4, task);
         task = new TaskVersions();
-        task.putTaskVersion(0, new Task("Подбери ключ от замка под номером 1", "Добавить"));
-        task.putTaskVersion(1, new Task("Подбери ключ от замка под номером 2", "Добавить"));
-        task.putTaskVersion(2, new Task("Подбери ключ от замка под номером 3", "Добавить"));
+        task.putTaskVersion(0, new Task("Собери обед из следующих блюд: <<Борщ, Оливье, Медовик, Компот>>.", "Добавить"));
+        task.putTaskVersion(1, new Task("Собери обед из следующих блюд: <<Фо Бо, Фуагра, Финики, Фанта>>.", "Добавить"));
+        task.putTaskVersion(2, new Task("Собери обед из следующих блюд: <<Картофельное пюре, Сосиски, Цезарь, Сок>>.", "Добавить"));
         easyTasksMap.put(4, task);
-        task = new TaskVersions();
-        task.putTaskVersion(0, new Task("Собери обед из следующих блюд: Борщ, Оливье, Медовик, Компот.", "Добавить"));
-        task.putTaskVersion(1, new Task("Собери обед из следующих блюд: Фо Бо, Фуагра, Финики, Фанта.", "Добавить"));
-        task.putTaskVersion(2, new Task("Собери обед из следующих блюд: Картофельное пюре, Сосиски, Цезарь, Сок.", "Добавить"));
-        easyTasksMap.put(5, task);
         this.easyTasksMap = easyTasksMap;
     }
 

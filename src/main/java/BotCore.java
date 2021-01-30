@@ -28,7 +28,7 @@ public class BotCore extends TelegramLongPollingBot {
     boolean sabotageBeforeVote = false;
     User starter = null;
     HashMap<String, Integer> voteResults = new HashMap<>();
-    private Settings settings = new Settings(5, 2, 2, 1, 30, 1);
+    private Settings settings = new Settings(4, 2, 2, 1, 30, 1);
     boolean redButton = false;
     volatile boolean redButtonReady = true;
     TaskText taskText = new TaskText();
@@ -432,7 +432,7 @@ public class BotCore extends TelegramLongPollingBot {
 
     public void checkGameEndBySabotage() {
         if (sabotageStatus && (sabotage.equals("Реактор") || sabotage.equals("Кислород"))){
-            sendMsg(admin.getChatId(), (sabotage.equals("Реактор") ? "Реактор возрван" : "Кислород закончился"), Keyboards.adminStartPanel());
+            sendMsg(admin.getChatId(), (sabotage.equals("Реактор") ? "Реактор взорвался" : "Кислород закончился"), Keyboards.adminStartPanel());
             gameEnd(false);
         }
     }
