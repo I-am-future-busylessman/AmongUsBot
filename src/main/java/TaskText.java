@@ -13,10 +13,10 @@ public class TaskText {
 
     private void makeSabotage(){
         Map<String, String> sabotage = new HashMap<>();
-        sabotage.put("Свет", "В столовой");
-        sabotage.put("Реактор", "В штабе");
-        sabotage.put("Связь", "В хранилище");
-        sabotage.put("Кислород", "В Лаборатории");
+        sabotage.put("Свет", "В хранилище");
+        sabotage.put("Реактор", "В гараже");
+        sabotage.put("Связь", "В оружейной");
+        sabotage.put("Кислород", "В гостиной");
         this.sabotage = sabotage;
     }
 }

@@ -28,7 +28,7 @@ public class BotCore extends TelegramLongPollingBot {
     boolean sabotageBeforeVote = false;
     User starter = null;
     HashMap<String, Integer> voteResults = new HashMap<>();
-    private Settings settings = new Settings(4, 2, 2, 1, 30, 1);
+    private Settings settings = new Settings(9, 2, 2, 1, 60, 2);
     boolean redButton = false;
     volatile boolean redButtonReady = true;
     TaskText taskText = new TaskText();
@@ -229,7 +229,7 @@ public class BotCore extends TelegramLongPollingBot {
         }else if (message.equals("Репорт") && user.getAlive()){
             report(user);
         }else if (user.getActiveTaskNum() != 0 &&
-                (message.equals(settings.getTask(user.getActiveTaskNum()).getCode()))){
+                (message.equals(user.getActiveTask().getCode()))){
             user.getComplitedTasks().add(user.getActiveTaskNum());
             if(user.getActiveTaskNum()/10 == 1)
                 user.setEasyTasks(user.getEasyTasks() - 1);
@@ -303,18 +303,18 @@ public class BotCore extends TelegramLongPollingBot {
                 sabotage = message;
                 sendMsg(user.getChatId(), "Это сделано в СССР, не ломается", Keyboards.rolePanel(user.getRole(), user.getAlive()));
             }
-        }else if (sabotageStatus && Integer.parseInt(message) > 0) {
-            checkSabotage(message, user);
         }else if(message.equals("Получить задание") && user.getAlive()) {
             user.getTask();
             while (true){
                 int finalTask = user.getActiveTaskNum();
                 if (settings.checkAvailableTasks(finalTask))
-                    break;
+                break;
                 user.getTask();
             }
             user.setActiveTask(settings.getTask(user.getActiveTaskNum()));
-            sendMsg(user.getChatId(), user.getActiveTask().getTaskText(), Keyboards.imposterPanel(user.getAlive()));
+            sendMsg(user.getChatId(), "Задание номер " + user.getActiveTaskNum() + "\n" + user.getActiveTask().getTaskText(), Keyboards.imposterPanel(user.getAlive()));
+        }else if (sabotageStatus && Integer.parseInt(message) > 0) {
+            checkSabotage(message, user);
         }else{
             sendMsg(user.getChatId(), "Неизвестная команда" ,Keyboards.rolePanel(false, user.getAlive()));
         }
