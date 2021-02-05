@@ -30,9 +30,13 @@ public class Keyboards {
         keyboardSecondRow.add(new KeyboardButton("Настройки"));
         KeyboardRow keyboardThirdRow = new KeyboardRow();
         keyboardThirdRow.add(new KeyboardButton("Покажи настройки"));
+        KeyboardRow keyboardFourthRow = new KeyboardRow();
+        keyboardFourthRow.add(new KeyboardButton("Повторить настройки"));
+        keyboardFourthRow.add(new KeyboardButton("Перезапуск"));
         keyboard.add(keyboardFirstRow);
         keyboard.add(keyboardSecondRow);
         keyboard.add(keyboardThirdRow);
+        keyboard.add(keyboardFourthRow);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }

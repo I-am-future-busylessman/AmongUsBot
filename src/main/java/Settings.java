@@ -198,12 +198,12 @@ public class Settings {
 
     public String getAllSettings(){
         String str = "";
-        str += getPlayers().toString() + " ";
-        str += getEasyTasks().toString() + " ";
-        str += getNormalTasks().toString() + " ";
-        str += getTimerTasks().toString() + " ";
-        str += getImposterKD().toString() + " ";
-        str += getImpostersCount();
+        str += "Количество игроков: " + getPlayers().toString() + "\n";
+        str += "Количество простых заданий: " + getEasyTasks().toString() + "\n";
+        str += "Количество средних заданий:" + getNormalTasks().toString() + "\n";
+        str += "Количество сложных заданий: " + getTimerTasks().toString() + "\n";
+        str += "Перезарядка импостера: " + getImposterKD().toString() + "\n";
+        str += "Количество импостеров: " + getImpostersCount() + "\n";
         return str;
     }
 

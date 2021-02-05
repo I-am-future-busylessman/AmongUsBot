@@ -5,10 +5,12 @@ import java.util.*;
 
 @Getter
 @Setter
-public class TaskText {
+public class SabotageTexts {
     Map<String, String> sabotage = new HashMap<>();
     String unavailable;
-    public TaskText() {
+    public SabotageTexts() {
+        unavailable = "все";
+        makeSabotage();
     }
 
 
@@ -23,5 +25,14 @@ public class TaskText {
                 sabotage.replace(k, v, "гостиная");
         });
         this.sabotage = sabotage;
+    }
+
+    public String getSabotageLocations(){
+        String result = "";
+        result += "Свет" + " " + sabotage.get("Свет") + "\n";
+        result += "Реактор" + " " + sabotage.get("Реактор") + "\n";
+        result += "Связь" + " " + sabotage.get("Связь") + "\n";
+        result += "Кислород" + " " + sabotage.get("Кислород") + "\n";
+        return result;
     }
 }

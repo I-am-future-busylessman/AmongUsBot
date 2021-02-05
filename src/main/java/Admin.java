@@ -8,5 +8,9 @@ import lombok.Setter;
 public class Admin {
     private String kill = "Admin";
     private String makeAlive = "Admin";
-    private final long chatId = 394615109;
+    private long chatId = 394615109;
+
+    public void setAdmin(long chatId){
+        this.chatId = chatId;
+    }
 }

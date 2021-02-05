@@ -28,12 +28,13 @@ public class BotCore extends TelegramLongPollingBot {
     boolean sabotageBeforeVote = false;
     User starter = null;
     HashMap<String, Integer> voteResults = new HashMap<>();
-    private Settings settings = new Settings(9, 2, 2, 1, 60, 2);
+    private Settings settings = new Settings(10, 2, 2, 1, 60, 2);
     boolean redButton = false;
     volatile boolean redButtonReady = true;
-    TaskText taskText = new TaskText();
+    SabotageTexts sabotageTexts = new SabotageTexts();
     boolean taskUpdate = false;
     boolean taskModify = false;
+    boolean settingsReady = false;
 
     String[] subStr;
     int voted = 0;
@@ -43,6 +44,13 @@ public class BotCore extends TelegramLongPollingBot {
         long chatId = update.getMessage().getChatId();
         if(!update.getMessage().hasText()) {
             sendMsg(chatId, "Я понимаю только текст", null);
+        }else if(message.startsWith("/startAdmin") && gameStatus.equals("init")){
+            if (message.endsWith("2190")) {
+                admin.setAdmin(chatId);
+                sendMsg(admin.getChatId(), "Вы теперь администратор", Keyboards.adminStartPanel());
+            }
+            else
+                sendMsg(chatId, "Неверный пароль администратора", Keyboards.empty());
         }else if(gameStatus.equals("init") && chatId == admin.getChatId()){
             adminBeforeStart(message);
         }else if(gameStatus.equals("init") && !(chatId == admin.getChatId())){
@@ -69,9 +77,9 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     public void adminBeforeStart(String message){
-        if (message.compareTo("/start") == 0) {
+        if (message.equals("/start")) {
             sendMsg(admin.getChatId(), "Здравствуй, администратор", Keyboards.adminStartPanel());
-        }else if (message.compareTo("Настройки") == 0){
+        }else if (message.equals("Настройки")){
             sendMsg(admin.getChatId(), "Введите следующие настройки через пробел: \n" +
                     "/set количество игроков \n" +
                     "количество простых заданий \n" +
@@ -79,20 +87,35 @@ public class BotCore extends TelegramLongPollingBot {
                     "количество сложных \n" +
                     "кд убийцы \n" +
                     "количество убийц\n" +
-                    "какая локация недоступна", null);
+                    "какая локация недоступна (хранилище, гараж, оружейная, штаб)", Keyboards.empty()
+            );
+        }else if(message.equals("Повторить настройки")){
+            settingsReady = true;
+            sendMsg(admin.getChatId(), "Повторены настройки предыдущей игры", Keyboards.adminStartPanel());
         }else if (message.length() > 4 && message.substring(0, 4).compareTo("/set") == 0){
             subStr = message.split(" ");
-            settings.setPlayers(Integer.valueOf(subStr[1]));
-            settings.setEasyTasks(Integer.valueOf(subStr[2]));
-            settings.setNormalTasks(Integer.valueOf(subStr[3]));
-            settings.setTimerTasks(Integer.valueOf(subStr[4]));
-            settings.setImposterKD(Integer.valueOf(subStr[5]));
-            settings.setImpostersCount(Integer.valueOf(subStr[6]));
-            taskText.setUnavailable(subStr[7]);
-            taskText.makeSabotage();
-            sendMsg(admin.getChatId(), "Настройки сохранены", null);
-        }else if (message.compareTo("Покажи настройки") == 0){
-            sendMsg(admin.getChatId(), settings.getAllSettings(), null);
+            if (subStr.length != 8)
+                sendMsg(admin.getChatId(), "Неправильный ввод настроек", Keyboards.adminStartPanel());
+            else {
+                settings.setPlayers(Integer.valueOf(subStr[1]));
+                settings.setEasyTasks(Integer.valueOf(subStr[2]));
+                settings.setNormalTasks(Integer.valueOf(subStr[3]));
+                settings.setTimerTasks(Integer.valueOf(subStr[4]));
+                settings.setImposterKD(Integer.valueOf(subStr[5]));
+                settings.setImpostersCount(Integer.valueOf(subStr[6]));
+                sabotageTexts.setUnavailable(subStr[7]);
+                sabotageTexts.makeSabotage();
+                settingsReady = true;
+                sendMsg(admin.getChatId(), "Настройки сохранены", Keyboards.adminStartPanel());
+            }
+        }else if(message.equals("Перезапуск")){
+            for (int i = 0; i < players.getPlayers().size(); i++) {
+                sendMsg(players.getPlayers().get(i).getChatId(), "Список пользователей сброшен, подключитесь снова", Keyboards.startPanel());
+            }
+            players = new PlayersList();
+            sendMsg(admin.getChatId(), "Игра успешно перезапущена", Keyboards.adminStartPanel());
+        }else if (message.equals("Покажи настройки")){
+            sendMsg(admin.getChatId(), settings.getAllSettings() + sabotageTexts.getSabotageLocations(), Keyboards.adminStartPanel());
         }else if (message.equals("Запуск")) {
             gameStart();
         }else {
@@ -104,17 +127,23 @@ public class BotCore extends TelegramLongPollingBot {
         if(message.equals("/start") && players.getUser(update.getMessage().getChatId()) == null){
             players.addPlayer(new User(update.getMessage().getChatId()));
             sendMsg(update.getMessage().getChatId(), "Здравствуй, игрок, Какой у тебя цвет?", null);
-        }else if(user.getChatId() != -1 && user.getColor() == null /* && gameStatus.equals("init")*/){
-            user.setColor(message);
-            user.setAlive(true);
-            user.setVoted(false);
-            sendMsg(admin.getChatId(), "Добален " + user.getColor() + " игрок", Keyboards.adminStartPanel());
-            sendMsg(user.getChatId(), texts.getHelloTexts().get((int) (Math.random() * 100) % 3) + user.getColor(), null);
-            if (players.getPlayers().stream().filter(u -> u.getColor() != null).count() == settings.getPlayers()) {
-                sendMsg(admin.getChatId(), "Команда укомплектована, можно начинать", Keyboards.adminStartPanel());
-            }
+        }else if(players.getPlayers().stream().anyMatch(u -> u.getChatId().equals(user.getChatId())) && user.getColor() == null){
+            if (message.equals("/start"))
+                sendMsg(user.getChatId(), "Неподходящее имя", Keyboards.empty());
+            else if(!settingsReady)
+                sendMsg(user.getChatId(), "Инициализация не завершена, подожди немного...", Keyboards.empty());
+            else{
+                    user.setColor(message);
+                    user.setAlive(true);
+                    user.setVoted(false);
+                    sendMsg(admin.getChatId(), "Добален " + user.getColor() + " игрок", Keyboards.adminStartPanel());
+                    sendMsg(user.getChatId(), texts.getHelloTexts().get((int) (Math.random() * 100) % 3) + user.getColor(), null);
+                    if (players.getPlayers().stream().filter(u -> u.getColor() != null).count() == settings.getPlayers()) {
+                        sendMsg(admin.getChatId(), "Команда укомплектована, можно начинать", Keyboards.adminStartPanel());
+                    }
+                }
         }else {
-            sendMsg(update.getMessage().getChatId(), "Неизвестная команда", null);
+            sendMsg(update.getMessage().getChatId(), "Неизвестная команда", Keyboards.empty());
         }
     }
 
@@ -387,7 +416,7 @@ public class BotCore extends TelegramLongPollingBot {
     public void sendSabotage(String text){
         for (int i = 0; i < players.getPlayers().size(); i++){
             if (players.getPlayers().get(i).getAlive()){
-                sendMsg(players.getPlayers().get(i).getChatId(), "Cломали " + text + "\nКод лежит в локации \"" + taskText.getSabotage().get(text) + "\"",
+                sendMsg(players.getPlayers().get(i).getChatId(), "Cломали " + text + "\nКод лежит в локации \"" + sabotageTexts.getSabotage().get(text) + "\"",
                          Keyboards.rolePanel(players.getPlayers().get(i).getRole(),true));
             }
         }
@@ -483,6 +512,7 @@ public class BotCore extends TelegramLongPollingBot {
         redButtonReady = true;
         taskUpdate = false;
         taskModify = false;
+        settingsReady = false;
     }
 
     public void report(User user){
