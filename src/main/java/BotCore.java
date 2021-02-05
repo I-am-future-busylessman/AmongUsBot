@@ -32,7 +32,6 @@ public class BotCore extends TelegramLongPollingBot {
     boolean redButton = false;
     volatile boolean redButtonReady = true;
     TaskText taskText = new TaskText();
-    HashMap<Integer, Integer> taskCooldown = new HashMap<>();
     boolean taskUpdate = false;
     boolean taskModify = false;
 
@@ -74,12 +73,13 @@ public class BotCore extends TelegramLongPollingBot {
             sendMsg(admin.getChatId(), "Здравствуй, администратор", Keyboards.adminStartPanel());
         }else if (message.compareTo("Настройки") == 0){
             sendMsg(admin.getChatId(), "Введите следующие настройки через пробел: \n" +
-                    "/set количество игроков " +
-                    "количество простых заданий " +
-                    "количество средних " +
-                    "количество сложных " +
-                    "кд убийцы " +
-                    "количество убийц", null);
+                    "/set количество игроков \n" +
+                    "количество простых заданий \n" +
+                    "количество средних \n" +
+                    "количество сложных \n" +
+                    "кд убийцы \n" +
+                    "количество убийц\n" +
+                    "какая локация недоступна", null);
         }else if (message.length() > 4 && message.substring(0, 4).compareTo("/set") == 0){
             subStr = message.split(" ");
             settings.setPlayers(Integer.valueOf(subStr[1]));
@@ -88,44 +88,13 @@ public class BotCore extends TelegramLongPollingBot {
             settings.setTimerTasks(Integer.valueOf(subStr[4]));
             settings.setImposterKD(Integer.valueOf(subStr[5]));
             settings.setImpostersCount(Integer.valueOf(subStr[6]));
+            taskText.setUnavailable(subStr[7]);
+            taskText.makeSabotage();
             sendMsg(admin.getChatId(), "Настройки сохранены", null);
         }else if (message.compareTo("Покажи настройки") == 0){
             sendMsg(admin.getChatId(), settings.getAllSettings(), null);
-        }else if (message.compareTo("Запуск") == 0) {
-            gameTime = new Date();
-            gameStatus = "game";
-            int impostersCount = 0;
-            sendMsg(admin.getChatId(), "Запускаем игру...", Keyboards.adminGamePanel());
-            while (impostersCount != settings.getImpostersCount()){
-                impostersCount = 0;
-                for (int i = 0; i < players.getPlayers().size(); i++) {
-                    Random rand = new Random(new Date().getTime());
-                    if (Math.abs(rand.nextInt()) % 6 == 3 && impostersCount < settings.getImpostersCount()) {
-                        players.getPlayers().get(i).setRole(false);
-                        impostersCount++;
-                    }else{
-                        players.getPlayers().get(i).setRole(true);
-                    }
-                    players.getPlayers().get(i).setEasyTasks(settings.getEasyTasks());
-                    players.getPlayers().get(i).setNormalTasks(settings.getNormalTasks());
-                    players.getPlayers().get(i).setHardTasks(settings.getTimerTasks());
-                    players.getPlayers().get(i).setTotalTasks(settings.getEasyTasks() + settings.getNormalTasks() + settings.getTimerTasks());
-                }
-            }
-            players.getPlayers().stream().filter(User::getRole).forEach(u -> sendMsg(u.getChatId(),
-                    "Ты член экипажа, твоя задача выполнять задания и вычислять убийц",
-                    Keyboards.rolePanel(true, true)));
-            ArrayList<String> names = new ArrayList<>();
-            final int imposterCount = settings.getImpostersCount();
-            players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> players.getPlayers().stream().filter(name -> !name.getRole() && !name.getColor().equals(u.getColor())).forEach(p -> names.add(p.getColor())));
-            players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> sendMsg(u.getChatId(),
-                    "Ты предатель, тебе доступны такие действия как Убийство и Саботаж." +
-                    "\nУничтожь их всех или сломай корабль." +
-                    "\nНе попадись!" + (imposterCount > 1 ? "\nСписок предателей: " + String.join(" ", names) : ""),
-                    Keyboards.rolePanel(false, true)));
-            //Отправляем сообщения администратору о том, кто предатели в игре
-            if (imposterCount > 1)
-                sendMsg(admin.getChatId(), "Предатели: " + String.join(" ", names), Keyboards.adminGamePanel());
+        }else if (message.equals("Запуск")) {
+            gameStart();
         }else {
             sendMsg(admin.getChatId(), "Неизвестная команда", Keyboards.adminStartPanel());
         }
@@ -418,7 +387,7 @@ public class BotCore extends TelegramLongPollingBot {
     public void sendSabotage(String text){
         for (int i = 0; i < players.getPlayers().size(); i++){
             if (players.getPlayers().get(i).getAlive()){
-                sendMsg(players.getPlayers().get(i).getChatId(), "Cломали " + text + "\nКод лежит в месте " + taskText.getSabotage().get(text),
+                sendMsg(players.getPlayers().get(i).getChatId(), "Cломали " + text + "\nКод лежит в локации \"" + taskText.getSabotage().get(text) + "\"",
                          Keyboards.rolePanel(players.getPlayers().get(i).getRole(),true));
             }
         }
@@ -443,6 +412,43 @@ public class BotCore extends TelegramLongPollingBot {
         }else if(players.getPlayers().stream().noneMatch(u -> !u.getRole() && u.getAlive())) {
             gameEnd(true);
         }
+    }
+
+    public void gameStart(){
+        gameTime = new Date();
+        gameStatus = "game";
+        int impostersCount = 0;
+        sendMsg(admin.getChatId(), "Запускаем игру...", Keyboards.adminGamePanel());
+        while (impostersCount != settings.getImpostersCount()){
+            impostersCount = 0;
+            for (int i = 0; i < players.getPlayers().size(); i++) {
+                Random rand = new Random(new Date().getTime());
+                if (Math.abs(rand.nextInt()) % 6 == 3 && impostersCount < settings.getImpostersCount()) {
+                    players.getPlayers().get(i).setRole(false);
+                    impostersCount++;
+                }else{
+                    players.getPlayers().get(i).setRole(true);
+                }
+                players.getPlayers().get(i).setEasyTasks(settings.getEasyTasks());
+                players.getPlayers().get(i).setNormalTasks(settings.getNormalTasks());
+                players.getPlayers().get(i).setHardTasks(settings.getTimerTasks());
+                players.getPlayers().get(i).setTotalTasks(settings.getEasyTasks() + settings.getNormalTasks() + settings.getTimerTasks());
+            }
+        }
+        players.getPlayers().stream().filter(User::getRole).forEach(u -> sendMsg(u.getChatId(),
+                "Ты член экипажа, твоя задача выполнять задания и вычислять убийц",
+                Keyboards.rolePanel(true, true)));
+        ArrayList<String> names = new ArrayList<>();
+        final int imposterCount = settings.getImpostersCount();
+        players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> players.getPlayers().stream().filter(name -> !name.getRole() && !name.getColor().equals(u.getColor())).forEach(p -> names.add(p.getColor())));
+        players.getPlayers().stream().filter(u -> !u.getRole()).forEach(u -> sendMsg(u.getChatId(),
+                "Ты предатель, тебе доступны такие действия как Убийство и Саботаж." +
+                        "\nУничтожь их всех или сломай корабль." +
+                        "\nНе попадись!" + (imposterCount > 1 ? "\nСписок предателей: " + String.join(" ", names) : ""),
+                Keyboards.rolePanel(false, true)));
+        //Отправляем сообщения администратору о том, кто предатели в игре
+        if (imposterCount > 1)
+            sendMsg(admin.getChatId(), "Предатели: " + String.join(" ", names), Keyboards.adminGamePanel());
     }
 
     public void gameEnd(boolean winners){
@@ -475,8 +481,6 @@ public class BotCore extends TelegramLongPollingBot {
         settings = new Settings(settings.getPlayers(), settings.getEasyTasks(), settings.getNormalTasks(), settings.getTimerTasks(), settings.getImposterKD(), settings.getImpostersCount());
         redButton = false;
         redButtonReady = true;
-        taskText = new TaskText();
-        taskCooldown = new HashMap<>();
         taskUpdate = false;
         taskModify = false;
     }
