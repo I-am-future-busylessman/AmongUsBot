@@ -18,11 +18,7 @@ public class Settings {
     private Map<Integer,TaskVersions> easyTasksMap = new HashMap<>();
     private Map<Integer,TaskVersions> normalTasksMap = new HashMap<>();
     private Map<Integer,TaskVersions> hardTasksMap = new HashMap<>();
-    private ArrayList<String> lightSolvers = new ArrayList<>();
-    private ArrayList<String> reactorSolvers = new ArrayList<>();
-    private ArrayList<String> oxygenSolvers = new ArrayList<>();
-    private ArrayList<String> networkSolvers = new ArrayList<>();
-    public Map<String, ArrayList<String>> sabotageSolvers = new HashMap<>();
+
 
     public Settings(Integer players, Integer easyTasks, Integer normalTasks, Integer timerTasks, Integer imposterKD, Integer impostersCount) {
         this.players = players;
@@ -31,7 +27,6 @@ public class Settings {
         this.timerTasks = timerTasks;
         this.imposterKD = imposterKD;
         this.impostersCount = impostersCount;
-        makeSabotageSolvers();
         makeEasyTasks();
         makeNormalTasks();
         makeHardTasks();
@@ -45,49 +40,6 @@ public class Settings {
         }else{
             return easyTasksMap.get(task % 10).getTask();
         }
-    }
-
-    public void makeLightSolvers(){
-        lightSolvers.add("880055");
-        lightSolvers.add("312456");
-        lightSolvers.add("784212");
-        lightSolvers.add("443355");
-        lightSolvers.add("915677");
-        sabotageSolvers.put("Свет", lightSolvers);
-    }
-
-    public void makeReactorSolvers(){
-        reactorSolvers.add("972830");
-        reactorSolvers.add("672459");
-        reactorSolvers.add("840981");
-        reactorSolvers.add("123123");
-        reactorSolvers.add("101010");
-        sabotageSolvers.put("Реактор", reactorSolvers);
-    }
-
-    public void makeOxygenSolvers(){
-        oxygenSolvers.add("231231");
-        oxygenSolvers.add("141315");
-        oxygenSolvers.add("965439");
-        oxygenSolvers.add("902930");
-        oxygenSolvers.add("145367");
-        sabotageSolvers.put("Кислород", oxygenSolvers);
-    }
-
-    public void makeNetworkSolvers(){
-        networkSolvers.add("324325");
-        networkSolvers.add("495343");
-        networkSolvers.add("123453");
-        networkSolvers.add("114325");
-        networkSolvers.add("774459");
-        sabotageSolvers.put("Связь", networkSolvers);
-    }
-
-    public void makeSabotageSolvers() {
-        makeLightSolvers();
-        makeNetworkSolvers();
-        makeOxygenSolvers();
-        makeReactorSolvers();
     }
 
     public void makeEasyTasks(){
