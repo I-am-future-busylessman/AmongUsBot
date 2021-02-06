@@ -4,7 +4,7 @@ import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 @Getter
-public class BotMain {
+public class Main {
     public static void main(String[] args) {
         ApiContextInitializer.init();
         TelegramBotsApi botapi = new TelegramBotsApi();

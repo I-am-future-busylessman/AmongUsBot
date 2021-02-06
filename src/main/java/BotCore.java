@@ -489,20 +489,26 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     public void reboot(){
-        for (int i = 0; i < players.getPlayers().size(); i++){
-            sendMsg(players.getPlayers().get(i).getChatId(), "Перезапуск игры, введите имя", Keyboards.empty());
-        }
-        sendMsg(admin.getChatId(), "Перезапуск", Keyboards.adminStartPanel());
+        makeStatistics();
         players.reboot();
         sabotage.reboot();
         gameStatus = "init";
         texts = new Texts();
         someoneKilled = false;
         voteResults = new HashMap<>();
-        settings = new Settings(settings.getPlayers(), settings.getEasyTasks(), settings.getNormalTasks(), settings.getTimerTasks(), settings.getImposterKD(), settings.getImpostersCount());
+        settings = new Settings(settings.getPlayers(),
+                settings.getEasyTasks(),
+                settings.getNormalTasks(),
+                settings.getTimerTasks(),
+                settings.getImposterKD(),
+                settings.getImpostersCount());
         redButton = false;
         redButtonReady = true;
         settingsReady = false;
+        for (int i = 0; i < players.getPlayers().size(); i++){
+            sendMsg(players.getPlayers().get(i).getChatId(), "Перезапуск игры, введите имя", Keyboards.empty());
+        }
+        sendMsg(admin.getChatId(), "Перезапуск", Keyboards.adminStartPanel());
     }
 
     public void report(User user){
@@ -616,6 +622,28 @@ public class BotCore extends TelegramLongPollingBot {
             //Конец потока кнопки
             if (sabotage.isBeforeVote())
                 startSabotage(sabotage.getType(), players.getUser(starter.getChatId()));
+        }
+    }
+
+    public void makeStatistics(){
+        int totalTasksComplited = 0;
+        for (User player: players.getPlayers()) {
+            totalTasksComplited += player.getComplitedTasks().size();
+            if(player.getRole())
+            sendMsg(player.getChatId(),
+                    "Выполнено заданий: " + player.getComplitedTasks().size() + " из " + player.getTotalTasks()
+                    , Keyboards.empty());
+            else
+                sendMsg(player.getChatId(), "Количество убийств: " + player.getTotalKills() + "\n"
+                        + "Количество саботажей:" + player.getTotalSabotages(), Keyboards.empty());
+
+        }
+        for (User player: players.getPlayers()) {
+            sendMsg(player.getChatId(),
+                    "Выполнено заданий: " + totalTasksComplited + " из " +
+                            player.getTotalTasks()*(settings.getPlayers() - settings.getImpostersCount()),
+                    Keyboards.empty());
+
         }
     }
 

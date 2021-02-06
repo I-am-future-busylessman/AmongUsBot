@@ -19,6 +19,8 @@ public class User {
     private String confirmColorToKill = "e";
     private long killTime = 0;
     private long sabotageTime = 0;
+    private int totalKills = 0;
+    private int totalSabotages = 0;
     int easyTasks;
     int normalTasks;
     int hardTasks;
