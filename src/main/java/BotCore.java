@@ -21,19 +21,15 @@ public class BotCore extends TelegramLongPollingBot {
     PlayersList players = new PlayersList();
     private Settings settings = new Settings(10, 2, 2, 1, 60, 2);
     Sabotage sabotage = new Sabotage();
+    Texts texts = new Texts();
     Date gameTime;
     String gameStatus = "init";
-    Texts texts = new Texts();
     boolean someoneKilled = false;
     User starter = null;
     HashMap<String, Integer> voteResults = new HashMap<>();
     boolean redButton = false;
     volatile boolean redButtonReady = true;
-    boolean taskUpdate = false;
-    boolean taskModify = false;
     boolean settingsReady = false;
-
-    String[] subStr;
     int voted = 0;
 
     public void onUpdateReceived(Update update) {
@@ -90,7 +86,7 @@ public class BotCore extends TelegramLongPollingBot {
             settingsReady = true;
             sendMsg(admin.getChatId(), "Повторены настройки предыдущей игры", Keyboards.adminStartPanel());
         }else if (message.length() > 4 && message.substring(0, 4).compareTo("/set") == 0){
-            subStr = message.split(" ");
+            String[] subStr = message.split(" ");
             if (subStr.length != 8)
                 sendMsg(admin.getChatId(), "Неправильный ввод настроек", Keyboards.adminStartPanel());
             else {
@@ -498,6 +494,7 @@ public class BotCore extends TelegramLongPollingBot {
         }
         sendMsg(admin.getChatId(), "Перезапуск", Keyboards.adminStartPanel());
         players.reboot();
+        sabotage.reboot();
         gameStatus = "init";
         texts = new Texts();
         someoneKilled = false;
@@ -505,10 +502,7 @@ public class BotCore extends TelegramLongPollingBot {
         settings = new Settings(settings.getPlayers(), settings.getEasyTasks(), settings.getNormalTasks(), settings.getTimerTasks(), settings.getImposterKD(), settings.getImpostersCount());
         redButton = false;
         redButtonReady = true;
-        taskUpdate = false;
-        taskModify = false;
         settingsReady = false;
-        sabotage.reboot();
     }
 
     public void report(User user){
@@ -609,10 +603,10 @@ public class BotCore extends TelegramLongPollingBot {
                     //делаем кнопку работоспособной
                     redButtonReady = true;
                     //Сообщение админу о начале работы кнопки
-                    sendMsg(admin.getChatId(), "Кнопка экстренного собрания активна", Keyboards.adminGamePanel());
+                    sendMsg(admin.getChatId(), "Кнопка для начала голосования готова", Keyboards.adminGamePanel());
                     //Сообщение игрокам о начале работы кнопки
                     for (int i = 0; i < players.getPlayers().size(); i++) {
-                        sendMsg(players.getPlayers().get(i).getChatId(), "Кнопка экстренного собрания активна", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                        sendMsg(players.getPlayers().get(i).getChatId(), "Кнопка для начала голосования готова", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -642,7 +636,7 @@ public class BotCore extends TelegramLongPollingBot {
             sendMessage.setReplyMarkup(keyboard);
         }
         try {
-            sendMessage(sendMessage);
+            execute(sendMessage);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
