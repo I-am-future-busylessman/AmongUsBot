@@ -17,6 +17,17 @@ public class Texts {
     private List<String> helloTexts = new ArrayList<>();
     private List<String> reportTexts = new ArrayList<>();
 
+    public Texts() {
+        makeHelloTexts();
+        makeComletingTaskTexts();
+        makeGettiingTaskTexts();
+        makeKillingTexts();
+        makeKillRepeatTexts();
+        makeSendingTaskTexts();
+        makeDeadTexts();
+        makeReportTexts();
+    }
+
     public void makeGettiingTaskTexts() {
         List<String> gettingTaskTexts= new ArrayList<>();
         gettingTaskTexts.add("Я напишу тебе, как будет задание...");
@@ -81,14 +92,7 @@ public class Texts {
         this.reportTexts = reportTexts;
     }
 
-    public Texts() {
-        makeHelloTexts();
-        makeComletingTaskTexts();
-        makeGettiingTaskTexts();
-        makeKillingTexts();
-        makeKillRepeatTexts();
-        makeSendingTaskTexts();
-        makeDeadTexts();
-        makeReportTexts();
+    public String getRandomGetTaskText(){
+        return sendingTaskTexts.get((int)(Math.random()*100)%3);
     }
 }
