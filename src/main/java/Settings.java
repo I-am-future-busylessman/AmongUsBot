@@ -48,7 +48,6 @@ public class Settings {
         task.putTaskVersion(0, new Task("Рассортирую папки с данными в алфавитном порядке.", "4571"));//
         task.putTaskVersion(1, new Task("Рассортируй папки c данными по первой букве их цвета.", "5417"));
         task.putTaskVersion(2, new Task("Расставь папки по порядку: Синий, Красный, Фиолетовый, Зелёный", "1475"));
-        //task.putTaskVersion(3, new Task("Расставь папки по количеству листов в них.", "Добавить"));
         easyTasksMap.put(0, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Проверь работу защитных щитов. Активируй, а затем дезактивируй их.", "6941"));

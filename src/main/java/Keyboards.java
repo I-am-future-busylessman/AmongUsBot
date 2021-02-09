@@ -32,7 +32,7 @@ public class Keyboards {
         keyboardThirdRow.add(new KeyboardButton("Покажи настройки"));
         KeyboardRow keyboardFourthRow = new KeyboardRow();
         keyboardFourthRow.add(new KeyboardButton("Повторить настройки"));
-        keyboardFourthRow.add(new KeyboardButton("Перезапуск"));
+        keyboardFourthRow.add(new KeyboardButton("Сменить цвет"));
         keyboard.add(keyboardFirstRow);
         keyboard.add(keyboardSecondRow);
         keyboard.add(keyboardThirdRow);
@@ -169,6 +169,43 @@ public class Keyboards {
         }
         KeyboardRow keyboardThirdRow = new KeyboardRow();
         keyboardThirdRow.add(new KeyboardButton("Отмена"));
+        keyboard.add(keyboardFirstRow);
+        keyboard.add(keyboardSecondRow);
+        keyboard.add(keyboardThirdRow);
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
+    }
+
+    public static ReplyKeyboardMarkup changeName(PlayersList players){
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        KeyboardRow keyboardFirstRow = new KeyboardRow();
+        KeyboardRow keyboardSecondRow = new KeyboardRow();
+        for (long i = 0; i < players.getPlayers().size(); i++){
+            if (i < players.getPlayers().size()/2){
+                keyboardFirstRow.add(new KeyboardButton(Objects
+                        .requireNonNull(players
+                                .getPlayers()
+                                .stream()
+                                .skip(i)
+                                .findFirst()
+                                .orElse(null)).getColor()));
+            }else{
+                keyboardSecondRow.add(new KeyboardButton(Objects
+                        .requireNonNull(players
+                                .getPlayers()
+                                .stream()
+                                .skip(i)
+                                .findFirst()
+                                .orElse(null)).getColor()));
+            }
+        }
+        KeyboardRow keyboardThirdRow = new KeyboardRow();
+        keyboardThirdRow.add(new KeyboardButton("Пропустить"));
         keyboard.add(keyboardFirstRow);
         keyboard.add(keyboardSecondRow);
         keyboard.add(keyboardThirdRow);
