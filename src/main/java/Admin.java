@@ -9,7 +9,7 @@ public class Admin {
     private String kill = "Admin";
     private String makeAlive = "Admin";
     private long chatId = 394615109;
-    private String changeColor = null;
+    private String changeColor = "null";
 
     public void setAdmin(long chatId){
         this.chatId = chatId;

@@ -75,16 +75,21 @@ public class Settings {
         task.putTaskVersion(0, new Task("Собери обед из следующих блюд: Борщ, Оливье, Медовик, Чай.", "12302243"));
         task.putTaskVersion(1, new Task("Собери обед из следующих блюд: Солянка, Цезарь, Наполеон, Сок.", "10342856"));
         task.putTaskVersion(2, new Task("Собери обед из следующих блюд: <<Борщ, Цезарь, Медовик, Сок>>.", "12342256"));
-        easyTasksMap.put(4, task);
+        easyTasksMap.put(5, task);
+        task = new TaskVersions();
+        task.putTaskVersion(0, new Task("Найди четырёхзначный код написанный невидимыми чернилами.", "ДОБАВИТЬ"));
+        task.putTaskVersion(1, new Task("Найди слово написанное невидимыми чернилами.", "ДОБАВИТЬ"));
+        task.putTaskVersion(2, new Task("Найди что нарисовано невидимыми чернилами.", "ДОБАВИТЬ"));
+        easyTasksMap.put(6, task);
         this.easyTasksMap = easyTasksMap;
     }
 
     public void makeNormalTasks(){
         Map<Integer,TaskVersions> normalTasksMap = new HashMap<>();
         TaskVersions task = new TaskVersions();
-        task.putTaskVersion(0, new Task("Найди код на стороне А", "8160"));
-        task.putTaskVersion(1, new Task("Найди код на стороне B", "60"));
-        task.putTaskVersion(2, new Task("Найди код на стороне C", "0618"));
+        task.putTaskVersion(0, new Task("Найди код на стороне А", "791"));
+        task.putTaskVersion(1, new Task("Найди код на стороне B", "824"));
+        task.putTaskVersion(2, new Task("Найди код на стороне C", "503"));
         normalTasksMap.put(0, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Рассортируй шарики по цветам Посчитай количество серых", "13"));
@@ -92,9 +97,9 @@ public class Settings {
         task.putTaskVersion(2, new Task("Рассортируй шарики по цветам Посчитай количество золотых", "13"));
         normalTasksMap.put(1, task);
         task = new TaskVersions();
-        task.putTaskVersion(0, new Task("Собери команду из космонавтов в скафандрах следующих цветов: Коричневый, Оранжевый, Зелёный, Фиолетовый", "19183111"));
+        task.putTaskVersion(0, new Task("Собери команду из космонавтов в скафандрах следующих цветов: Коричневый, Оранжевый, Тёмно-зелёный, Белый", "19183173"));
         task.putTaskVersion(1, new Task("Собери команду из космонавтов в скафандрах следующих цветов: Жёлтый, Салатовый, Розовый, Красный", "45219844"));
-        task.putTaskVersion(2, new Task("Собери команду из космонавтов в скафандрах следующих цветов: Синий, Белый, , Чёрный", "16731310"));
+        task.putTaskVersion(2, new Task("Собери команду из космонавтов в скафандрах следующих цветов: Синий, Белый, Голубой, Чёрный", "16731310"));
         normalTasksMap.put(2, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Измерь длину ботинка скафандра.", "28"));
@@ -114,6 +119,11 @@ public class Settings {
         task.putTaskVersion(3, new Task("Найди всех желтых астронавтов на картинке.", "11"));
         task.putTaskVersion(4, new Task("Найди всех зелёных астронавтов на картинке.", "12"));
         normalTasksMap.put(5, task);
+        task = new TaskVersions();
+        task.putTaskVersion(0, new Task("Посчитай сколько астероидов на этом видео\nhttps://youtu.be/qkQfE8mqHFU", "14"));
+        task.putTaskVersion(1, new Task("Посчитай сколько астероидов на этом видео\nhttps://youtu.be/CcBc3ssVKrg", "17"));
+        task.putTaskVersion(2, new Task("Посчитай сколько астероидов на этом видео\nhttps://youtu.be/78w52BCTp8A", "19"));
+        normalTasksMap.put(6, task);
         this.normalTasksMap = normalTasksMap;
     }
 
@@ -121,14 +131,18 @@ public class Settings {
         Map<Integer,TaskVersions> hardTasksMap = new HashMap<>();
         TaskVersions task = new TaskVersions();
         task.putTaskVersion(0, new Task("Найди весь металлический мусор, введи количество.", "14"));
-        task.putTaskVersion(1, new Task("Найди весь бумажный мусор, введи количество.", "16"));
+        task.putTaskVersion(1, new Task("Найди все батарейки, введи количество.", "ДОБАВИТЬ"));
         task.putTaskVersion(2, new Task("Найди весь пластиковый мусор, введи количество.", "5"));
         hardTasksMap.put(0, task);
-        //task = new TaskVersions();
-        //task.putTaskVersion(0, new Task("Расшифруй послание номер 1.", "2315"));
-        //task.putTaskVersion(1, new Task("Расшифруй послание номер 2", "9842"));
-        //task.putTaskVersion(2, new Task("Расшифруй послание номер 3", "6732"));
-        //hardTasksMap.put(1, task);
+        task = new TaskVersions();
+        task.putTaskVersion(0, new Task("Сопоставь цветы и подставки по цвету", "ДОБАВИТЬ"));
+        task.putTaskVersion(1, new Task("Сопоставь цветы и подставки по спецсимволам", "ДОБАВИТЬ"));
+        task.putTaskVersion(2, new Task("Сопоставь цветы и подставки по парам:\n" +
+                            "Зелёный горшок - белая подставка\n" +
+                            "Чёрный горшок - зелёная подставка\n" +
+                            "Белый горшок - коричневая подставка" +
+                            "Коричневый горшок - чёрная подставка\n", "ДОБАВИТЬ"));
+        hardTasksMap.put(1, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Собери код по территории хранилища. Тебе нужны данные помеченные вертикальными линиями.", "6180"));
         task.putTaskVersion(1, new Task("Собери код по территории хранилища. Тебе нужны данные помеченные горизонтальными линиями.", "4124"));
@@ -144,6 +158,11 @@ public class Settings {
         task.putTaskVersion(1, new Task("Реши пример. X = 99, Y = 45, Z = 17", "55"));
         task.putTaskVersion(2, new Task("Реши пример. X = -30, Y = 6, Z = -13", "-5"));
         hardTasksMap.put(4, task);
+        task = new TaskVersions();
+        task.putTaskVersion(0, new Task("Взвесь метеориты. Напиши вес самого тяжёлого, с точностью до десятых.", "ДОБАВИТЬ"));
+        task.putTaskVersion(1, new Task("Взвесь метеориты. Напиши вес самого лёгкого, с точностью до десятых.", "ДОБАВИТЬ"));
+        task.putTaskVersion(2, new Task("Взвесь метеориты. Напиши общий вес, с точностью до десятых.", "-ДОБАВИТЬ"));
+        hardTasksMap.put(5, task);
         this.hardTasksMap = hardTasksMap;
     }
 

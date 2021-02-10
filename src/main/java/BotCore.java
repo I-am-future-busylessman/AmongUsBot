@@ -19,7 +19,7 @@ public class BotCore extends TelegramLongPollingBot {
     private final String botName = "Space_mafia_bot";
     private Admin admin = new Admin();
     PlayersList players = new PlayersList();
-    private Settings settings = new Settings(10, 2, 2, 1, 60, 2);
+    private Settings settings = new Settings(12, 2, 2, 1, 30, 3);
     Sabotage sabotage = new Sabotage();
     Texts texts = new Texts();
     Date gameTime;
@@ -71,7 +71,7 @@ public class BotCore extends TelegramLongPollingBot {
 
     public void adminBeforeStart(String message){
         if (message.equals("/start")) {
-            sendMsg(admin.getChatId(), "Здравствуй, администратор", Keyboards.adminStartPanel());
+            sendMsg(admin.getChatId(), "Приветствую вас, администратор", Keyboards.adminStartPanel());
         }else if (message.equals("Настройки")){
             sendMsg(admin.getChatId(), "Введите следующие настройки через пробел: \n" +
                     "/set количество игроков \n" +
@@ -105,7 +105,7 @@ public class BotCore extends TelegramLongPollingBot {
             admin.setChangeColor("Admin");
             sendMsg(admin.getChatId(), "Какой цвет заменить?", Keyboards.changeName(players));
         }else if(admin.getChangeColor().equals("Admin")){
-            admin.setChangeColor(null);
+            admin.setChangeColor("null");
             sendMsg(admin.getChatId(), "Пользователю отправлено сообщение о замене цвета.", Keyboards.adminStartPanel());
             sendMsg(players.getPlayerByColor(message).getChatId(), "Введите свой цвет снова", Keyboards.empty());
             players.getPlayerByColor(message).setColor(null);
@@ -127,8 +127,6 @@ public class BotCore extends TelegramLongPollingBot {
                 sendMsg(user.getChatId(), "Неподходящее имя", Keyboards.empty());
             else if(!settingsReady)
                 sendMsg(user.getChatId(), "Инициализация не завершена, подожди немного...", Keyboards.empty());
-            else if(players.getPlayerByColor(message) != null)
-                sendMsg(user.getChatId(), "Игрок с таким цветом уже существует", Keyboards.empty());
             else{
                     user.setColor(message);
                     user.setAlive(true);
@@ -295,7 +293,7 @@ public class BotCore extends TelegramLongPollingBot {
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    System.out.println("Ошибка в потоке кнопки");
+
                 }
             });
             //Конец потока кнопки

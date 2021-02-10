@@ -55,7 +55,7 @@ public class Sabotage {
         oxygenSolvers.add("231231");
         oxygenSolvers.add("141315");
         oxygenSolvers.add("965439");
-        oxygenSolvers.add("902930");
+        oxygenSolvers.add("774459");
         oxygenSolvers.add("145367");
         sabotageSolvers.put("Кислород", oxygenSolvers);
     }
@@ -84,10 +84,10 @@ public class Sabotage {
 
     public String getSabotageLocations(){
         String result = "";
-        result += "Свет" + " " + sabotage.get("Свет") + "\n";
-        result += "Реактор" + " " + sabotage.get("Реактор") + "\n";
-        result += "Связь" + " " + sabotage.get("Связь") + "\n";
-        result += "Кислород" + " " + sabotage.get("Кислород") + "\n";
+        result += "Свет " + sabotage.get("Свет") + "\n";
+        result += "Реактор " + sabotage.get("Реактор") + "\n";
+        result += "Связь " + sabotage.get("Связь") + "\n";
+        result += "Кислород " + sabotage.get("Кислород");
         return result;
     }
 
