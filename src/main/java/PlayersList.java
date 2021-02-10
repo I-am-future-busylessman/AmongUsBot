@@ -1,6 +1,8 @@
 import lombok.Getter;
 import lombok.Setter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 @Getter
 @Setter
@@ -49,5 +51,9 @@ public class PlayersList{
         if (!findPlayer(user)) {
             players.add(user);
         }
+    }
+
+    public void shuffle(){
+        Collections.shuffle(players);
     }
 }

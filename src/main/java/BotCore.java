@@ -573,6 +573,7 @@ public class BotCore extends TelegramLongPollingBot {
         sendMsg(admin.getChatId(), "Запускаем игру...", Keyboards.adminGamePanel());
         while (impostersCount != settings.getImpostersCount()){
             impostersCount = 0;
+            players.shuffle();
             for (int i = 0; i < players.getPlayers().size(); i++) {
                 Random rand = new Random(new Date().getTime());
                 if (Math.abs(rand.nextInt()) % 6 == 3 && impostersCount < settings.getImpostersCount()) {
