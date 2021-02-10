@@ -39,6 +39,7 @@ public class BotCore extends TelegramLongPollingBot {
             sendMsg(chatId, "Я понимаю только текст", null);
         }else if(message.startsWith("/startAdmin") && gameStatus.equals("init")){
             if (message.endsWith("2190")) {
+                sendMsg(admin.getChatId(), "У вас забрали роль администратора", Keyboards.empty());
                 admin.setAdmin(chatId);
                 sendMsg(admin.getChatId(), "Вы теперь администратор", Keyboards.adminStartPanel());
             }
@@ -176,7 +177,6 @@ public class BotCore extends TelegramLongPollingBot {
         }else if (message.equals("Репорт") && user.getAlive()){
             report(user);
         }else if (sabotage.isStatus() && sabotage.getSabotageSolvers().get(sabotage.getType()).stream().anyMatch(u -> u.equals(message))){
-            //изменить условие?
             checkSabotage(message, user);
         }else if (message.equals("Убить")){
             sendMsg(user.getChatId(), "Ты был избранником!" +
@@ -285,10 +285,12 @@ public class BotCore extends TelegramLongPollingBot {
                     //делаем кнопку работоспособной
                     redButtonReady = true;
                     //Сообщение админу о начале работы кнопки
-                    sendMsg(admin.getChatId(), "Кнопка для начала голосования готова", Keyboards.adminGamePanel());
-                    //Сообщение игрокам о начале работы кнопки
-                    for (int i = 0; i < players.getPlayers().size(); i++) {
-                        sendMsg(players.getPlayers().get(i).getChatId(), "Кнопка для начала голосования готова", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                    if (gameStatus.equals("game")) {
+                        sendMsg(admin.getChatId(), "Кнопка для начала голосования готова", Keyboards.adminGamePanel());
+                        //Сообщение игрокам о начале работы кнопки
+                        for (int i = 0; i < players.getPlayers().size(); i++) {
+                            sendMsg(players.getPlayers().get(i).getChatId(), "Кнопка для начала голосования готова", Keyboards.rolePanel(players.getPlayers().get(i).getRole(), players.getPlayers().get(i).getAlive()));
+                        }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
