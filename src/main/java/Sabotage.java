@@ -71,10 +71,10 @@ public class Sabotage {
 
     public void makeSabotage(){
         Map<String, String> sabotage = new HashMap<>();
-        sabotage.put("Свет", "хранилище");
-        sabotage.put("Реактор", "гараж");
+        sabotage.put("Свет", "гараж");
+        sabotage.put("Реактор", "штаб");
         sabotage.put("Связь", "оружейная");
-        sabotage.put("Кислород", "штаб");
+        sabotage.put("Кислород", "хранилище");
         sabotage.forEach((k, v) -> {
             if (v.equals(unavailable))
                 sabotage.replace(k, v, "гостиная");

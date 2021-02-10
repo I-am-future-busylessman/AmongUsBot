@@ -19,7 +19,7 @@ public class BotCore extends TelegramLongPollingBot {
     private final String botName = "Space_mafia_bot";
     private Admin admin = new Admin();
     PlayersList players = new PlayersList();
-    private Settings settings = new Settings(12, 2, 2, 1, 30, 3);
+    private Settings settings = new Settings(9, 2, 2, 1, 60, 1);
     Sabotage sabotage = new Sabotage();
     Texts texts = new Texts();
     Date gameTime;
@@ -171,8 +171,6 @@ public class BotCore extends TelegramLongPollingBot {
                         texts.getRandomGetTaskText() + user.getActiveTaskNum() + "\n"
                                 + user.getActiveTask().getTaskText(),
                         Keyboards.rolePanel(user.getRole(), user.getAlive()));
-        }else if (user.getActiveTaskNum() != 0 && !message.equals(user.getActiveTask().getCode())){
-            sendMsg(user.getChatId(), "Неверный код задания", Keyboards.rolePanel(user.getRole(), user.getAlive()));
         }else if (user.getActiveTaskNum() != 0 && message.equals(user.getActiveTask().getCode())){
             completeTask(user);
         }else if (message.equals("Репорт") && user.getAlive()){
@@ -184,8 +182,9 @@ public class BotCore extends TelegramLongPollingBot {
             sendMsg(user.getChatId(), "Ты был избранником!" +
                     "\nПредрекали что ты уничтожишь ситхов, а не примкнёшь к ним." +
                     "\nВосстановишь равновесие силы, а не ввергнешь её во мрак!", Keyboards.rolePanel(user.getRole(), user.getAlive()));
-        }
-         else{
+        }else if (user.getActiveTaskNum() != 0 && !message.equals(user.getActiveTask().getCode())){
+            sendMsg(user.getChatId(), "Неверный код задания", Keyboards.rolePanel(user.getRole(), user.getAlive()));
+        }else{
             sendMsg(user.getChatId(), "Неизвестная команда", Keyboards.rolePanel(user.getRole(), user.getAlive()));
         }
     }
@@ -495,6 +494,8 @@ public class BotCore extends TelegramLongPollingBot {
     }
 
     private void checkSabotage(String message, User user) {
+        sabotage.getSabotageSolvers().get(sabotage.getType()).forEach(System.out::println);
+        System.out.println(message);
         if (sabotage.getSabotageSolvers().get(sabotage.getType()).stream().anyMatch(u -> u.equals(message))){
             sabotage.sabotageSolvers.get(sabotage.getType()).removeIf(u -> u.equals(message));
             if(sabotage.sabotageSolvers.get(sabotage.getType()).size() == 0)
@@ -596,7 +597,7 @@ public class BotCore extends TelegramLongPollingBot {
                         "\nНе попадись!" + (imposterCount > 1 ? "\nСписок предателей: " + String.join(" ", names) : ""),
                 Keyboards.rolePanel(false, true)));
         //Отправляем сообщения администратору о том, кто предатели в игре
-        if (imposterCount > 1)
+        if (imposterCount > 0)
             sendMsg(admin.getChatId(), "Предатели: " + String.join(" ", names), Keyboards.adminGamePanel());
     }
 
