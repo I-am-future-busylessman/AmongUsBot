@@ -127,6 +127,8 @@ public class BotCore extends TelegramLongPollingBot {
                 sendMsg(user.getChatId(), "Неподходящее имя", Keyboards.empty());
             else if(!settingsReady)
                 sendMsg(user.getChatId(), "Инициализация не завершена, подожди немного...", Keyboards.empty());
+            else if(players.getPlayerByColor(message) != null)
+                sendMsg(user.getChatId(), "Игрок с таким цветом уже существует", Keyboards.empty());
             else{
                     user.setColor(message);
                     user.setAlive(true);
@@ -336,6 +338,7 @@ public class BotCore extends TelegramLongPollingBot {
                 sendMsg(user.getChatId(), message + texts.getKillingTexts().get((int)(Math.random()*100)%3), Keyboards.rolePanel(false, true));
                 sendMsg(players.getPlayerByColor(message).getChatId(), texts.getDeadTexts().get((int)(Math.random()*100)%3), Keyboards.rolePanel(players.getPlayerByColor(message).getRole(), false));
                 user.setKillTime(time.getTime());
+                user.setTotalKills(user.getTotalKills() + 1);
                 checkGameEnd();
             }else{
                 sendMsg(user.getChatId(), "Совсем офигел! Огонь по своим!", Keyboards.rolePanel(user.getRole(), user.getAlive()));
@@ -429,6 +432,7 @@ public class BotCore extends TelegramLongPollingBot {
     public void checkSabotageStart(String message, User user){
         if (sabotage.getSabotageSolvers().containsKey(message)) {
             starter = user;
+            user.setTotalSabotages(user.getTotalSabotages() + 1);
             startSabotage(message, user);
         }else{
             sabotage.setType(message);
@@ -681,14 +685,12 @@ public class BotCore extends TelegramLongPollingBot {
             else
                 sendMsg(player.getChatId(), "Количество убийств: " + player.getTotalKills() + "\n"
                         + "Количество саботажей:" + player.getTotalSabotages(), Keyboards.empty());
-
         }
         for (User player: players.getPlayers()) {
             sendMsg(player.getChatId(),
-                    "Выполнено заданий: " + totalTasksComplited + " из " +
+                    "Выполнено заданий всем экипажем вместе: " + totalTasksComplited + " из " +
                             player.getTotalTasks()*(settings.getPlayers() - settings.getImpostersCount()),
                     Keyboards.empty());
-
         }
     }
 

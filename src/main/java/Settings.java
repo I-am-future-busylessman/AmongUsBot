@@ -66,11 +66,11 @@ public class Settings {
         task.putTaskVersion(1, new Task("Кто дойдёт до лаборатории.", "2"));
         task.putTaskVersion(2, new Task("Кто дойдёт до столовой.", "1"));
         easyTasksMap.put(3, task);
-        //task = new TaskVersions();
-        //task.putTaskVersion(0, new Task("Подбери ключ от замка под номером 1", "Добавить"));
-        //task.putTaskVersion(1, new Task("Подбери ключ от замка под номером 2", "Добавить"));
-        //task.putTaskVersion(2, new Task("Подбери ключ от замка под номером 3", "Добавить"));
-        //easyTasksMap.put(4, task);
+        task = new TaskVersions();
+        task.putTaskVersion(0, new Task("Подбери ключ от замка под номером 1", "Добавить"));
+        task.putTaskVersion(1, new Task("Подбери ключ от замка под номером 2", "Добавить"));
+        task.putTaskVersion(2, new Task("Подбери ключ от замка под номером 3", "Добавить"));
+        easyTasksMap.put(4, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Собери обед из следующих блюд: Борщ, Оливье, Медовик, Чай.", "12302243"));
         task.putTaskVersion(1, new Task("Собери обед из следующих блюд: Солянка, Цезарь, Наполеон, Сок.", "10342856"));
@@ -82,9 +82,9 @@ public class Settings {
     public void makeNormalTasks(){
         Map<Integer,TaskVersions> normalTasksMap = new HashMap<>();
         TaskVersions task = new TaskVersions();
-        task.putTaskVersion(0, new Task("Найди все цифры в тексте.", "8160"));
-        task.putTaskVersion(1, new Task("Найди все цифры в последних 10 строчках песни.", "60"));
-        task.putTaskVersion(2, new Task("Найди все цифры в тесте начиная с конца.", "0618"));
+        task.putTaskVersion(0, new Task("Найди код на стороне А", "8160"));
+        task.putTaskVersion(1, new Task("Найди код на стороне B", "60"));
+        task.putTaskVersion(2, new Task("Найди код на стороне C", "0618"));
         normalTasksMap.put(0, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Рассортируй шарики по цветам Посчитай количество серых", "13"));
