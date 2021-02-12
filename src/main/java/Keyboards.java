@@ -17,6 +17,15 @@ public class Keyboards {
         }
     }
 
+    public static ReplyKeyboardMarkup admiPanel(String gameStatus){
+        if (gameStatus.equals("init")){
+            return adminStartPanel();
+        }else if(gameStatus.equals("game")){
+            return adminGamePanel();
+        }else
+            return adminVotePanel();
+    }
+
     public static ReplyKeyboardMarkup adminStartPanel() {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);

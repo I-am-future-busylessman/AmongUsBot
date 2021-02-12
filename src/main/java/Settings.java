@@ -13,7 +13,9 @@ public class Settings {
     private Integer normalTasks;
     private Integer timerTasks;
     private Integer imposterKD;
+    private Integer sabotageKD;
     private Integer impostersCount;
+    private Integer redButtonKD;
     private Map<Integer, TaskVersions> allTasks = new HashMap<>();
     private Map<Integer,TaskVersions> easyTasksMap = new HashMap<>();
     private Map<Integer,TaskVersions> normalTasksMap = new HashMap<>();
