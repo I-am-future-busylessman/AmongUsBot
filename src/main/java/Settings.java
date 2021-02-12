@@ -176,8 +176,10 @@ public class Settings {
         str += "Количество простых заданий: " + getEasyTasks().toString() + "\n";
         str += "Количество средних заданий:" + getNormalTasks().toString() + "\n";
         str += "Количество сложных заданий: " + getTimerTasks().toString() + "\n";
-        str += "Перезарядка импостера: " + getImposterKD().toString() + "\n";
+        str += "Перезарядка бластера: " + getImposterKD().toString() + "\n";
+        str += "Перезарядка саботажа: " + getSabotageKD().toString() + "\n";
         str += "Количество импостеров: " + getImpostersCount() + "\n";
+        str += "Перезарядка кнопки: " + getRedButtonKD().toString() + "\n";
         return str;
     }
 
