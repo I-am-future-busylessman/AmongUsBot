@@ -22,12 +22,14 @@ public class Settings {
     private Map<Integer,TaskVersions> hardTasksMap = new HashMap<>();
 
 
-    public Settings(Integer players, Integer easyTasks, Integer normalTasks, Integer timerTasks, Integer imposterKD, Integer impostersCount) {
+    public Settings(Integer players, Integer easyTasks, Integer normalTasks, Integer timerTasks, Integer imposterKD, Integer sabotageKD,Integer redButtonKD , Integer impostersCount) {
         this.players = players;
         this.easyTasks = easyTasks;
         this.normalTasks = normalTasks;
         this.timerTasks = timerTasks;
         this.imposterKD = imposterKD;
+        this.sabotageKD = sabotageKD;
+        this.redButtonKD = redButtonKD;
         this.impostersCount = impostersCount;
         makeEasyTasks();
         makeNormalTasks();

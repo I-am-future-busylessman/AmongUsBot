@@ -19,7 +19,7 @@ public class BotCore extends TelegramLongPollingBot {
     private final String botName = "Space_mafia_bot";
     private Admin admin = new Admin();
     PlayersList players = new PlayersList();
-    private Settings settings = new Settings(9, 2, 2, 1, 60, 1);
+    private Settings settings = new Settings(9, 2, 2, 1, 60,50 , 40 , 1);
     Sabotage sabotage = new Sabotage();
     Texts texts = new Texts();
     Date gameTime;
@@ -665,6 +665,8 @@ public class BotCore extends TelegramLongPollingBot {
                 settings.getNormalTasks(),
                 settings.getTimerTasks(),
                 settings.getImposterKD(),
+                settings.getSabotageKD(),
+                settings.getRedButtonKD(),
                 settings.getImpostersCount());
         redButton = false;
         redButtonReady = true;
