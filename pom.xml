@@ -61,7 +61,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        Main
+                                        com.among_us_bot_core.Main
                                     </mainClass>
                                 </manifest>
                             </archive>

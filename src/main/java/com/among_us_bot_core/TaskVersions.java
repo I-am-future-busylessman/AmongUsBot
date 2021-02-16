@@ -1,3 +1,5 @@
+package com.among_us_bot_core;
+
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,3 +1,5 @@
+package com.among_us_bot_core;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

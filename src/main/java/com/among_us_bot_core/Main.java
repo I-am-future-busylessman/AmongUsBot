@@ -1,3 +1,5 @@
+package com.among_us_bot_core;
+
 import lombok.Getter;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;

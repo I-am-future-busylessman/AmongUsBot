@@ -1,3 +1,5 @@
+package com.among_us_bot_core;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -78,7 +80,7 @@ public class Settings {
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Собери обед из следующих блюд: Борщ, Оливье, Медовик, Чай.", "12302243"));
         task.putTaskVersion(1, new Task("Собери обед из следующих блюд: Солянка, Цезарь, Наполеон, Сок.", "10342856"));
-        task.putTaskVersion(2, new Task("Собери обед из следующих блюд: <<Борщ, Цезарь, Медовик, Сок>>.", "12342256"));
+        task.putTaskVersion(2, new Task("Собери обед из следующих блюд: Борщ, Цезарь, Медовик, Сок.", "12342256"));
         easyTasksMap.put(5, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Найди четырёхзначный код написанный невидимыми чернилами.", "9702"));
@@ -134,12 +136,12 @@ public class Settings {
     public void makeHardTasks(){
         Map<Integer,TaskVersions> hardTasksMap = new HashMap<>();
         TaskVersions task = new TaskVersions();
-        task.putTaskVersion(0, new Task("Найди весь металлический мусор, введи количество.", "17"));
-        task.putTaskVersion(1, new Task("Найди все батарейки, введи количество.", "9"));
+        task.putTaskVersion(0, new Task("Найди весь металлический мусор, введи количество.", "15"));
+        task.putTaskVersion(1, new Task("Найди все батарейки, введи количество.", "7"));
         task.putTaskVersion(2, new Task("Найди весь пластиковый мусор, введи количество.", "4"));
         hardTasksMap.put(0, task);
         task = new TaskVersions();
-        task.putTaskVersion(0, new Task("Сопоставь цветы и подставки по цвету: зелёный, белый, чёрный, коричневый", "6839"));
+        task.putTaskVersion(0, new Task("Сопоставь цветы и подставки по цвету: зелёный, белый, чёрный, коричневый", "6938"));
         task.putTaskVersion(1, new Task("Сопоставь цветы и подставки по спецсимволам: треугольник, квадрат, звёздочка, круг", "9836"));
         task.putTaskVersion(2, new Task("Сопоставь цветы и подставки по парам:\n" +
                             "Зелёный горшок - белая подставка\n" +
@@ -163,9 +165,9 @@ public class Settings {
         task.putTaskVersion(2, new Task("Реши пример. X = -30, Y = 6, Z = -13", "-5"));
         hardTasksMap.put(4, task);
         task = new TaskVersions();
-        task.putTaskVersion(0, new Task("Взвесь метеориты. Напиши вес самого тяжёлого, с точностью до десятых.", "1070"));
-        task.putTaskVersion(1, new Task("Взвесь метеориты. Напиши вес самого лёгкого, с точностью до десятых.", "910"));
-        task.putTaskVersion(2, new Task("Взвесь метеориты. Напиши общий вес, с точностью до десятых.", "4000"));
+        task.putTaskVersion(0, new Task("Взвесь метеориты. Напиши вес самого тяжёлого, с точностью до десятков.", "1480"));
+        task.putTaskVersion(1, new Task("Взвесь метеориты. Напиши вес самого лёгкого, с точностью до десятков.", "320"));
+        task.putTaskVersion(2, new Task("Взвесь метеориты. Напиши общий вес, с точностью до десятков.", "3700"));
         hardTasksMap.put(5, task);
         this.hardTasksMap = hardTasksMap;
     }

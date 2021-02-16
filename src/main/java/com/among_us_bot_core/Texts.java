@@ -1,3 +1,4 @@
+package com.among_us_bot_core;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -5,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Getter
 public class Texts {
@@ -93,6 +95,6 @@ public class Texts {
     }
 
     public String getRandomGetTaskText(){
-        return sendingTaskTexts.get((int)(Math.random()*100)%3);
+        return sendingTaskTexts.get(new Random().nextInt(1000) % 3);
     }
 }

@@ -1,7 +1,8 @@
+package com.among_us_bot_core;
+
 import lombok.Getter;
 import lombok.Setter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 @Getter
