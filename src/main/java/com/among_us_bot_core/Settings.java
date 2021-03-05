@@ -18,6 +18,7 @@ public class Settings {
     private Integer sabotageKD;
     private Integer impostersCount;
     private Integer redButtonKD;
+    private String password;
     private Map<Integer, TaskVersions> allTasks = new HashMap<>();
     private Map<Integer,TaskVersions> easyTasksMap = new HashMap<>();
     private Map<Integer,TaskVersions> normalTasksMap = new HashMap<>();
@@ -73,7 +74,7 @@ public class Settings {
         task.putTaskVersion(2, new Task("Кто дойдёт до столовой.", "1"));
         easyTasksMap.put(3, task);
         task = new TaskVersions();
-        task.putTaskVersion(0, new Task("Подбери ключ от замка под номером 1", "0088"));
+        task.putTaskVersion(0, new Task("Подбери ключ от замка под номером 1", "0088")); 
         task.putTaskVersion(1, new Task("Подбери ключ от замка под номером 2", "8912"));
         task.putTaskVersion(2, new Task("Подбери ключ от замка под номером 3", "2450"));
         easyTasksMap.put(4, task);
@@ -109,7 +110,7 @@ public class Settings {
         normalTasksMap.put(2, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Измерь длину ботинка скафандра.", "28"));
-        task.putTaskVersion(1, new Task("Измерь ширину ботинка скафандра.", "39"));
+        task.putTaskVersion(1, new Task("Измерь высоту ботинка скафандра.", "39"));
         normalTasksMap.put(3, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Собери предложение чёрного цвета.", "В отсеке с кислородом произошла утечка"));
@@ -157,7 +158,7 @@ public class Settings {
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Посчитай сколько весит весь груз на корабле.", "8888"));
         task.putTaskVersion(1, new Task("Посчитай сколько весят все продукты на корабле.", "9999"));
-        task.putTaskVersion(2, new Task("Посчитай сколько весят все медикаменты на корабле.", "1823"));
+        task.putTaskVersion(2, new Task("Посчитай сколько весят все медикаменты на корабле.", "3019"));
         hardTasksMap.put(3, task);
         task = new TaskVersions();
         task.putTaskVersion(0, new Task("Реши пример. X = 60, Y = 36, Z = 16", "32"));

@@ -56,7 +56,7 @@ public class User {
 
     public void getTask() {
         int taskNumber = 0;
-        int number = new Random().nextInt(1000);
+        int number = new Random().nextInt(10);
         if (number % 3 == 2 && hardTasks > 0) {
             taskNumber += 30;
             taskNumber = getTaskNumber(taskNumber);
@@ -77,7 +77,7 @@ public class User {
     private int getTaskNumber(int taskNumber) {
         int finalTaskNumber = taskNumber;
         while (true) {
-            int finalNumber = new Random().nextInt(1000);
+            int finalNumber = new Random().nextInt(10);
             if (complitedTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber)
                     && oldTasks.stream().noneMatch(i -> i == finalNumber + finalTaskNumber)) {
                 taskNumber += finalNumber;

@@ -66,7 +66,7 @@ public class Sabotage {
         networkSolvers.add("324325");
         networkSolvers.add("495343");
         networkSolvers.add("123453");
-        networkSolvers.add("114325");
+        //networkSolvers.add("114325");
         networkSolvers.add("774459");
         sabotageSolvers.put("Связь", networkSolvers);
     }
