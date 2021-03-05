@@ -105,7 +105,7 @@ public class BotCore extends TelegramLongPollingBot {
         }else if(message.equals("Повторить настройки")) {
             settingsReady = true;
             sendMsg(chatId, "Повторены настройки предыдущей игры", Keyboards.adminStartPanel());
-        }else if (message.substring(0, 4).equals("/pas")){
+        }else if (message.startsWith("/pas")){
             String[] subStr = message.split(" ");
             if (subStr.length != 2)
                 sendMsg(chatId, "Неправильная установка пароля", Keyboards.adminStartPanel());
@@ -113,7 +113,7 @@ public class BotCore extends TelegramLongPollingBot {
                 settings.setPassword(subStr[1]);
                 sendMsg(chatId, "Пароль игры: " + settings.getPassword(), Keyboards.adminStartPanel());
             }
-        }else if (message.substring(0, 4).equals("/set")){
+        }else if (message.startsWith("/set")){
             String[] subStr = message.split(" ");
             if (subStr.length != 10)
                 sendMsg(chatId, "Неправильный ввод настроек", Keyboards.adminStartPanel());
